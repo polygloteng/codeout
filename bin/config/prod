@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# General settings
+readonly Env=prod
+readonly Project=codeout-prod

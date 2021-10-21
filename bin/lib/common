@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+function check_usage() {
+  set +u
+  if [[ -z "${env}" ]]; then
+    cat <<EOS >&2
+Usage: $0 ENV
+Parameters:
+  ENV: 環境名
+EOS
+    exit 1
+  fi
+  set -u
+}
+
+function setup_constants() {
+  local env="$1"
+  local cwd="$2"
+
+  local config_dir_path="${cwd}/config"
+  . "${config_dir_path}/common"
+  local envs=${Envs//,/ }
+  local found=""
+  for e in ${envs[*]}; do
+    if [[ "${e}" = "${env}" ]]; then
+      found="True"
+      break
+    fi
+  done
+  if [[ -z "${found}" ]]; then
+    echo "wrong environment parameter '${env}' passed." >&2
+    exit 2
+  fi
+
+  local config_file_path=${config_dir_path}/${env}
+  . "${config_file_path}"
+}

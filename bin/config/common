@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# General settings
+readonly CompanyId=polygloteng
+
+# Environments
+readonly Envs="dev,prod"

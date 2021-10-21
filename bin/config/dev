@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# General settings
+readonly Env=dev
+readonly Project=codeout-dev

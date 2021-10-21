@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function build() {
+  local cwd="$1"
+  local dir="${cwd}/../functions"
+  pushd "${dir}" >/dev/null || exit
+  yarn build
+  popd >/dev/null || exit
+}
+
+function deploy() {
+  firebase --project ${Project} deploy --only functions
+}
+
+function main() {
+  local env="$1"
+  local cwd
+  cwd="$(cd "$(dirname "$0")" && pwd)"
+  . ${cwd}/lib/common
+  check_usage
+  setup_constants "${env}" "${cwd}"
+
+  build "${cwd}"
+  deploy
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi

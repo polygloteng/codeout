@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  function isValidUser(user) {
+    return user.size() == 4
+      && 'github_uid' in user && user.github_uid is string && user.github_uid.size() <= 20
+      && 'point' in user && user.point is number
+      && 'created' in user && user.created is timestamp
+      && 'updated' in user && user.updated is timestamp
+  }
+
+  function isValidPublicProfile(profile) {
+    return profile.size() == 5
+      && 'nickname' in profile && profile.nickname is string && profile.nickname.size() <= 128
+      && 'thumbnail_url' in profile && profile.thumbnail_url is string && profile.thumbnail_url.size() <= 2048
+      && 'score' in profile && profile.score is number
+      && 'created' in profile && profile.created is timestamp
+      && 'updated' in profile && profile.updated is timestamp
+  }
+
+  match /databases/{database}/documents {
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid)
+    }
+    function publicProfilePath(uid) {
+      return /databases/$(database)/documents/public-profiles/$(uid)
+    }
+    match /users/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == 'github.com'
+        && isValidUser(request.resource.data)
+        && request.resource.data.created == request.time
+        && request.resource.data.updated == request.time
+        && !exists(publicProfilePath(request.auth.uid))
+        && existsAfter(publicProfilePath(request.auth.uid));
+    }
+    match /public-profiles/{uid} {
+      allow read;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && isValidPublicProfile(request.resource.data)
+        && request.resource.data.nickname == request.auth.token.name
+        && request.resource.data.created == request.time
+        && request.resource.data.updated == request.time
+        && !exists(userPath(request.auth.uid))
+        && existsAfter(userPath(request.auth.uid));
+    }
+    match /tasks/{task} {
+      allow read: if true;
+      allow create,update: if request.auth != null;
+    }
+
+  }
+}

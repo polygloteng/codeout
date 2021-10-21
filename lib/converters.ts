@@ -1,0 +1,79 @@
+import { FirestoreDataConverter, Timestamp } from 'firebase/firestore'
+import { User, PublicProfile, Task } from '@/types/db'
+
+function assertUser(data: any): asserts data is User {
+  const d = data as Partial<User>
+  if (
+    !(
+      typeof d?.github_uid === 'string' &&
+      typeof d?.point === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not User type')
+  }
+}
+
+export const userConverter: FirestoreDataConverter<User> = {
+  fromFirestore(snapshot, options) {
+    const data = snapshot.data(options)
+    assertUser(data)
+    return data
+  },
+  toFirestore: (model: User) => model,
+}
+
+function assertPublicProfile(data: any): asserts data is PublicProfile {
+  const d = data as Partial<PublicProfile>
+  if (
+    !(
+      typeof d?.nickname === 'string' &&
+      typeof d?.thumbnail_url === 'string' &&
+      typeof d?.score === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not PublicProfile type')
+  }
+}
+
+export const publicProfileConverter: FirestoreDataConverter<PublicProfile> = {
+  fromFirestore(snapshot, options) {
+    const data = snapshot.data(options)
+    assertPublicProfile(data)
+    return data
+  },
+  toFirestore: (model: PublicProfile) => model,
+}
+
+function assertTask(data: any): asserts data is Task {
+  const d = data as Partial<Task>
+  if (
+    !(
+      typeof d?.name === 'string' &&
+      typeof d?.description === 'string' &&
+      typeof d?.thumbnail_url === 'string' &&
+      typeof d?.repo_url === 'string' &&
+      typeof d?.point === 'number' &&
+      typeof d?.score === 'number' &&
+      Array.isArray(d?.tags) &&
+      typeof d?.level === 'number' &&
+      typeof d?.avg_rating === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not Task type')
+  }
+}
+
+export const taskConverter: FirestoreDataConverter<Task> = {
+  fromFirestore(snapshot, options) {
+    const data = snapshot.data(options)
+    assertTask(data)
+    return data
+  },
+  toFirestore: (model: Task) => model,
+}
