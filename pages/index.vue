@@ -48,7 +48,6 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 import { defineComponent, reactive, useContext, useAsync } from '@nuxtjs/composition-api'
 import { Task } from '~/types/db'
 import { taskConverter } from '~/lib/converters'
-import { authStore } from '~/store'
 
 interface Data {
   tasks: Task[]

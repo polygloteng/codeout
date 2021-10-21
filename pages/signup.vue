@@ -7,17 +7,28 @@
 <script lang="ts">
 import { getAuth, signInWithPopup, GithubAuthProvider } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
-import { defineComponent, useContext, useRouter } from '@nuxtjs/composition-api'
-import { authStore } from '~/store'
+import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
 import { retrieveGitHubProfile } from '~/lib/auth'
 import { userConverter, publicProfileConverter } from '~/lib/converters'
+import RequireAuth from '~/middleware/requireAuth'
 
 export default defineComponent({
+  middleware: RequireAuth,
   setup() {
     const context = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
+    const auth = getAuth()
+    onBeforeMount(() => {
+      // required in case of direct access while the user is signed in
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          context.redirect('/')
+        }
+        // after the page is displayed, page transition will be monitored by the middleware, so unsubscribe it
+        unsubscribe()
+      })
+    })
     const signUp = async () => {
-      const auth = getAuth()
       const provider = new GithubAuthProvider()
       try {
         const result = await signInWithPopup(auth, provider)
