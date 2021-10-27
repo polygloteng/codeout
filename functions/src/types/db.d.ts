@@ -1,4 +1,4 @@
-import { Timestamp, DocumentReference } from 'firebase/firestore'
+import { Timestamp, DocumentReference } from '@google-cloud/firestore'
 
 export interface User {
   id?: string
@@ -33,6 +33,8 @@ export interface Task {
   updated: Timestamp
 }
 
+// DocumentReferenceはクライアント用SDKとサーバー用SDKの両方で異なる定義が行われているため、
+// DocumentReferenceを含む型はクライアント用とサーバー用で別々に定義する必要がある
 export interface Purchase {
   id?: string
   task_ref: DocumentReference<Task>

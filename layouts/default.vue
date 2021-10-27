@@ -96,6 +96,7 @@ export default defineComponent({
     const signOut = () => {
       const auth = getAuth()
       auth.signOut()
+      authStore.setGitHubUserName(null)
       router.push('/')
     }
     const signedIn = computed(() => authStore.isSignedIn)

@@ -4,10 +4,10 @@ import { authStore } from '~/store'
 
 const plugin: Plugin = (context) => {
   const auth = getAuth()
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged((user) => {
     if (user) {
       authStore.setUser({
-        name: user.displayName ?? undefined
+        email: user.email ?? undefined,
       })
     } else {
       authStore.setUser(null)

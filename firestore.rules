@@ -2,8 +2,9 @@ rules_version = '2';
 
 service cloud.firestore {
   function isValidUser(user) {
-    return user.size() == 4
+    return user.size() == 5
       && 'github_uid' in user && user.github_uid is string && user.github_uid.size() <= 20
+      && 'github_username' in user && user.github_username is string && user.github_username.size() <= 50
       && 'point' in user && user.point is number
       && 'created' in user && user.created is timestamp
       && 'updated' in user && user.updated is timestamp
@@ -16,6 +17,14 @@ service cloud.firestore {
       && 'score' in profile && profile.score is number
       && 'created' in profile && profile.created is timestamp
       && 'updated' in profile && profile.updated is timestamp
+  }
+
+  function isValidPurchase(purchase) {
+    return purchase.size() == 4
+      && 'task_ref' in purchase && purchase.task_ref is path
+      && 'point' in purchase && purchase.point is number
+      && 'created' in purchase && purchase.created is timestamp
+      && 'updated' in purchase && purchase.updated is timestamp
   }
 
   match /databases/{database}/documents {
@@ -35,11 +44,17 @@ service cloud.firestore {
         && !exists(publicProfilePath(request.auth.uid))
         && existsAfter(publicProfilePath(request.auth.uid));
     }
+    match /users/{uid}/purchase/{task} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && isValidPurchase(request.resource.data);
+        // && request.resource.data.created == request.time
+        // && request.resource.data.updated == request.time;
+    }
     match /public-profiles/{uid} {
       allow read;
       allow create: if request.auth != null && request.auth.uid == uid
         && isValidPublicProfile(request.resource.data)
-        && request.resource.data.nickname == request.auth.token.name
         && request.resource.data.created == request.time
         && request.resource.data.updated == request.time
         && !exists(userPath(request.auth.uid))
@@ -49,6 +64,5 @@ service cloud.firestore {
       allow read: if true;
       allow create,update: if request.auth != null;
     }
-
   }
 }
