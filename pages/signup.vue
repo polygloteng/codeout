@@ -5,11 +5,12 @@
 </template>
 
 <script lang="ts">
-import { getAuth, signInWithPopup, GithubAuthProvider } from 'firebase/auth'
+import { getAuth, signInWithPopup, GithubAuthProvider, getAdditionalUserInfo } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
 import { retrieveGitHubProfile } from '~/lib/auth'
 import { userConverter, publicProfileConverter } from '~/lib/converters'
+import { authStore } from '~/store'
 import RequireAuth from '~/middleware/requireAuth'
 
 export default defineComponent({
@@ -33,13 +34,15 @@ export default defineComponent({
       try {
         const result = await signInWithPopup(auth, provider)
         const user = result.user
-        console.log(user)
+        console.log(`user is ${JSON.stringify(user)}`)
+        const additionalUserInfo = getAdditionalUserInfo(result)
+        console.log(`additionalUserInfo is ${JSON.stringify(additionalUserInfo)}`)
 
         // validation
         if (!user.email) throw new Error('failed to get email')
-        if (!user.displayName) throw new Error('failed to get nickname')
         const githubUserProfile = retrieveGitHubProfile(user)
         if (!githubUserProfile) throw new Error('failed to retrieve GitHub user profile')
+        if (!additionalUserInfo || !additionalUserInfo.username) throw new Error('failed to retrieve GitHub username')
 
         // create user information if it does not exist
         const userSnapshot = await getDoc(doc(context.$db, 'users', user.uid))
@@ -50,12 +53,13 @@ export default defineComponent({
           const batch = writeBatch(context.$db)
           batch.set(userRef, {
             github_uid: githubUserProfile.uid,
+            github_username: additionalUserInfo.username,
             point: 0,
             created: now,
             updated: now,
           })
           batch.set(publicProfileRef, {
-            nickname: user.displayName,
+            nickname: additionalUserInfo.username,
             thumbnail_url: user.photoURL ?? '',
             score: 0,
             created: now,
@@ -63,9 +67,11 @@ export default defineComponent({
           })
           await batch.commit()
         }
+        authStore.setGitHubUserName(additionalUserInfo.username)
         router.push('/')
       } catch (error) {
         console.log(error)
+        auth.signOut()
       }
     }
     return { signUp }
@@ -73,5 +79,4 @@ export default defineComponent({
 })
 </script>
 
-<style>
-</style>
+<style></style>

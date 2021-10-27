@@ -1,73 +1,139 @@
-import * as functions from "firebase-functions";
-import { Octokit } from "@octokit/rest";
+import * as functions from 'firebase-functions'
+import * as admin from 'firebase-admin'
+import * as path from 'path'
+import { Octokit } from '@octokit/rest'
+import { RequestError } from '@octokit/request-error'
+import { userConverter, taskConverter, purchaseConverter } from './lib/converters'
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
+interface PurchaseTaskRequest {
+  task_id: string
+}
 
-export const purchaseTask = functions.https.onCall(async (data, context) => {
-  functions.logger.info("purchaseTask called");
-  // 認証されていなければエラーを返す
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'authentication required')
-  }
+interface PurchaseTaskResponse {
+  message: string
+}
 
-  const octokit = new Octokit({
-    auth: functions.config().github.token
-  });
+export const purchaseTask = functions
+  .region('asia-northeast1')
+  .https.onCall(async (req: PurchaseTaskRequest, context) => {
+    functions.logger.info('purchaseTask called')
+    functions.logger.info(JSON.stringify(req))
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'authentication required')
+    }
 
-  try {
-    const res = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
-      template_owner: 'zskclassroom01',
-      template_repo: 'github-starter-course',
-      name: 'hoge',
-      owner: 'zskclassroom01',
-      private: true,
-    })
-    console.log(JSON.stringify(res))
-  } catch (error) {
-    console.log(JSON.stringify(error))
-    throw new functions.https.HttpsError('internal', 'GitHub API call failed')
-  }
+    const octokit = new Octokit({ auth: functions.config().github.token })
+    const owner = functions.config().github.organization
+    admin.initializeApp()
 
-  // try {
-  //   Templateリポジトリからユーザー用のリポジトリを作成するGitHub APIをコール
-  //   1秒スリープ(Secondary limit rates対策)
-  // } catch {
-  //   if エラーが「既にリポジトリが作成されている」ことによるエラーの場合 {
-  //     なにもしない
-  //   } else {
-  //     エラーを返す
-  //   }
-  // }
+    try {
+      await admin.firestore().runTransaction(async (transaction) => {
+        // トランザクションの実行時間が長くなるのは望ましくないが、GitHub APIのコール回数が増える方がデメリットが大きい。
+        // (rate limitに抵触してAPIが実行できなくなる可能性がある)
+        // userドキュメントとtaskドキュメントは滅多にupdateされないので、
+        // 現時点ではとりあえずトランザクションが長くなってもGitHub APIのコール回数を少なくする方を優先する。
 
-  // try {
-  //   ユーザー用のリポジトリにブランチ保護設定をおこなうGitHub APIをコール
-  //   1秒スリープ(Secondary limit ratest対策)
-  // } catch {
-  //   エラーを返す(このAPIは冪等性があるのでエラーが発生するのはNG)
-  // }
+        functions.logger.info('transaction start')
+        const userRef = admin.firestore().doc(`users/${context.auth!.uid}`).withConverter(userConverter)
+        const userSnapshot = await transaction.get(userRef)
+        const taskRef = admin.firestore().doc(`tasks/${req.task_id}`).withConverter(taskConverter)
+        const taskSnapshot = await transaction.get(taskRef)
+        const user = userSnapshot.data()
+        const task = taskSnapshot.data()
+        if (!user) throw new functions.https.HttpsError('internal', 'User does not exist')
+        if (!task) throw new functions.https.HttpsError('internal', 'Task does not exist')
+        if (user.point < task.point) throw new functions.https.HttpsError('internal', 'Not enough points')
 
-  // try {
-  //   トランザクションを開始する {
-  //     // read
-  //     userドキュメントとtaskドキュメントとuser/taskドキュメントを取得する
+        const srcRepoName = path.basename(task.repo_url)
+        functions.logger.info(`srcRepoName = ${srcRepoName}`)
+        const dstRepoName = `${srcRepoName}-${user.github_uid}`
+        functions.logger.info(`dstRepoName = ${dstRepoName}`)
 
-  //     // validation
-  //     user.pointがtask.point未満ならばエラーを返す
-  //     user/taskドキュメントが既に存在するならばエラーを返す
+        // Templateリポジトリのclone
+        try {
+          const res = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
+            template_owner: owner,
+            template_repo: srcRepoName,
+            name: dstRepoName,
+            owner: owner,
+            private: true,
+          })
+          functions.logger.info('cloning repo API call succeeded')
+          functions.logger.info(JSON.stringify(res))
+          await new Promise((resolve) => setTimeout(resolve, 1000)) // for avoiding secondary rate limits
+        } catch (error) {
+          functions.logger.info('error occurred in cloning repo API')
+          functions.logger.info(JSON.stringify(error))
+          if (error instanceof RequestError && error.status === 422) {
+            // 既にリポジトリがclone済みの場合は422エラーが返されるのでこの場合は何もしない
+          } else {
+            throw error
+          }
+        }
 
-  //     // update or insert
-  //     userのpointを減算して更新
-  //     user/taskドキュメントを新規作成
-  //     ユーザー用リポジトリの外部コラボレータとしてユーザを招待するGitHub APIをコール
-  //   }
-  // } catch {
-  //   ユーザーをリポジトリの外部コラボレーターから削除するGitHub APIをコール
-  // }
-  return { message: "hoge" }
-});
+        // mainブランチの保護設定
+        try {
+          const res = await octokit.request('PUT /repos/{owner}/{repo}/branches/{branch}/protection', {
+            owner: owner,
+            repo: dstRepoName,
+            branch: 'main',
+            required_status_checks: {
+              strict: true,
+              contexts: ['check'],
+            },
+            enforce_admins: true,
+            required_pull_request_reviews: null,
+            restrictions: null,
+          })
+          functions.logger.info('protecting branch API call succeeded')
+          functions.logger.info(JSON.stringify(res))
+          await new Promise((resolve) => setTimeout(resolve, 1000)) // for avoiding secondary rate limits
+        } catch (error) {
+          functions.logger.info('error occurred in protecting branch API for main branch')
+          throw error
+        }
+
+        // リポジトリの外部コラボレータとしてユーザを招待
+        try {
+          const res = await octokit.request('PUT /repos/{owner}/{repo}/collaborators/{username}', {
+            owner: owner,
+            repo: dstRepoName,
+            username: user.github_username,
+            permission: 'push',
+          })
+          functions.logger.info('inviting collaborator API call succeeded')
+          functions.logger.info(JSON.stringify(res))
+        } catch (error) {
+          functions.logger.info('error occurred in inviting collaborator API')
+          throw error
+        }
+
+        // 未購入の場合のみ購入処理を実行
+        const purchaseRef = admin
+          .firestore()
+          .doc(`users/${context.auth!.uid}/purchase/${req.task_id}`)
+          .withConverter(purchaseConverter)
+        const purchaseSnapshot = await transaction.get(purchaseRef)
+        if (!purchaseSnapshot.exists) {
+          transaction.update(userRef, { point: user.point - task.point })
+          const now = admin.firestore.Timestamp.now() // transaction.setではserverTimestampは使用不可のようである
+          transaction.set(purchaseRef, {
+            task_ref: taskRef,
+            point: task.point,
+            created: now,
+            updated: now,
+          })
+        }
+      })
+    } catch (error) {
+      functions.logger.info('error occurred in puchase transaction')
+      functions.logger.info(JSON.stringify(error))
+      if (error instanceof functions.https.HttpsError) {
+        throw error
+      } else {
+        throw new functions.https.HttpsError('internal', 'Purchase transaction failed')
+      }
+    }
+
+    return { message: 'purchase completed' } as PurchaseTaskResponse
+  })

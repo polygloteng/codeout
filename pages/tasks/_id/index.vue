@@ -47,9 +47,14 @@ import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/funct
 import { defineComponent, reactive, useContext, useAsync } from '@nuxtjs/composition-api'
 import { Task } from '~/types/db'
 import { taskConverter } from '~/lib/converters'
+import { authStore } from '~/store'
 
 interface Data {
   task?: Task
+}
+
+interface PurchaseTaskRequest {
+  task_id: string
 }
 
 interface PurchaseTaskResponse {
@@ -66,15 +71,18 @@ export default defineComponent({
       const docSnapshot = await getDoc(doc(context.$db, 'tasks', context.params.value.id).withConverter(taskConverter))
       // docSnapshot.get()
       if (docSnapshot.exists()) {
+        console.log(docSnapshot.data())
         data.task = docSnapshot.data()
       } else {
         console.log('No such document!')
       }
     })
     const purchaseTask = async () => {
-      const functions = getFunctions()
-      const purchaseTask = httpsCallable<unknown, PurchaseTaskResponse>(functions, 'purchaseTask')
-      const result = await purchaseTask({ text: 'dummy' })
+      const gitHubUserName = authStore.getGitHubUserName
+      if (!gitHubUserName) throw new Error('GitHub username had to be retrieved')
+      const functions = getFunctions(undefined, 'asia-northeast1')
+      const purchaseTask = httpsCallable<PurchaseTaskRequest, PurchaseTaskResponse>(functions, 'purchaseTask')
+      const result = await purchaseTask({ task_id: context.params.value.id })
       console.log(result.data.message)
     }
     return { data, purchaseTask }
@@ -82,5 +90,4 @@ export default defineComponent({
 })
 </script>
 
-<style>
-</style>
+<style></style>
