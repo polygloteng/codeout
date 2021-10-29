@@ -1,11 +1,12 @@
-import { FirestoreDataConverter, Timestamp } from 'firebase/firestore'
-import { User, PublicProfile, Task } from '~/types/db'
+import { FirestoreDataConverter, Timestamp, DocumentReference } from 'firebase/firestore'
+import { User, PublicProfile, Task, Purchase } from '~/types/db'
 
 export function assertUser(data: any): asserts data is User {
   const d = data as Partial<User>
   if (
     !(
       typeof d?.github_uid === 'string' &&
+      typeof d?.github_username === 'string' &&
       typeof d?.point === 'number' &&
       d?.created instanceof Timestamp &&
       d?.updated instanceof Timestamp
@@ -76,4 +77,28 @@ export const taskConverter: FirestoreDataConverter<Task> = {
     return data
   },
   toFirestore: (model: Task) => model,
+}
+
+export function assertPurchase(data: any): asserts data is Purchase {
+  const d = data as Partial<Purchase>
+  if (
+    !(
+      d?.task_ref instanceof DocumentReference &&
+      typeof d?.repo_url === 'string' &&
+      typeof d?.point === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not Purchase type')
+  }
+}
+
+export const purchaseConverter: FirestoreDataConverter<Purchase> = {
+  fromFirestore(snapshot) {
+    const data = snapshot.data()
+    assertPurchase(data)
+    return data as Purchase
+  },
+  toFirestore: (model: Purchase) => model,
 }

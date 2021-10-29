@@ -29,28 +29,41 @@
 
           <div class="text-h5 text-left font-weight-bold mt-10">タスクの概要</div>
           <div class="text-body1 text-left">{{ data.task.description }}</div>
+
+          <div v-if="data.purchase">
+            <div class="text-h5 text-left font-weight-bold mt-10">リポジトリ</div>
+            <div class="text-body1 text-left">
+              <a :href="data.purchase.repo_url">{{ data.purchase.repo_url }}</a>
+            </div>
+          </div>
         </v-col>
       </v-row>
+      <div class="mx-auto mt-10" style="width: 200px">
+        <div v-if="!signedIn"><router-link to="/signup">会員登録して購入</router-link></div>
+        <div v-else-if="data.purchase">購入済み</div>
+        <div v-else-if="purchasing">購入処理実行中</div>
+        <div v-else>
+          <v-btn @click="purchase">購入</v-btn>
+        </div>
+      </div>
     </v-container>
     <v-container fluid v-else>
       <div>task doesn't exist</div>
     </v-container>
-    <div class="mx-auto mt-10" style="width: 200px">
-      <v-btn @click="purchaseTask">購入</v-btn>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { doc, getDoc } from 'firebase/firestore'
-import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions'
-import { defineComponent, reactive, useContext, useAsync } from '@nuxtjs/composition-api'
-import { Task } from '~/types/db'
-import { taskConverter } from '~/lib/converters'
-import { authStore } from '~/store'
+import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import { defineComponent, reactive, useContext, useAsync, onMounted, computed, watch } from '@nuxtjs/composition-api'
+import { Task, Purchase } from '~/types/db'
+import { taskConverter, purchaseConverter } from '~/lib/converters'
+import { authStore, purchaseStore } from '~/store'
 
 interface Data {
   task?: Task
+  purchase?: Purchase
 }
 
 interface PurchaseTaskRequest {
@@ -66,26 +79,73 @@ export default defineComponent({
     const context = useContext()
     const data = reactive<Data>({
       task: undefined,
+      purchase: undefined,
     })
+    const task_id = context.params.value.id
+    const signedIn = computed(() => authStore.isSignedIn)
+    const purchasing = computed(() => {
+      const user = authStore.getUser
+      if (!user) return false
+      const purchasingList = purchaseStore.getPurchasingList
+      return `${user.uid}/${task_id}` in purchasingList
+    })
+    const refreshPurchaseStates = async () => {
+      const user = authStore.getUser
+      if (user) {
+        const purchaseSnapshot = await getDoc(
+          doc(context.$db, `users/${user.uid}/purchases`, task_id).withConverter(purchaseConverter)
+        )
+        if (purchaseSnapshot.exists()) {
+          purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+          data.purchase = purchaseSnapshot.data()
+        }
+      }
+    }
     useAsync(async () => {
-      const docSnapshot = await getDoc(doc(context.$db, 'tasks', context.params.value.id).withConverter(taskConverter))
-      // docSnapshot.get()
-      if (docSnapshot.exists()) {
-        console.log(docSnapshot.data())
-        data.task = docSnapshot.data()
+      const taskSnapshot = await getDoc(doc(context.$db, 'tasks', task_id).withConverter(taskConverter))
+      if (taskSnapshot.exists()) {
+        console.log(taskSnapshot.data())
+        data.task = taskSnapshot.data()
       } else {
         console.log('No such document!')
       }
     })
-    const purchaseTask = async () => {
+    onMounted(async () => {
+      if (authStore.isSignedIn) refreshPurchaseStates()
+    })
+    watch(signedIn, (value) => {
+      if (value) refreshPurchaseStates()
+    })
+    const purchase = async () => {
+      const user = authStore.getUser
+      if (!user) throw new Error('User must be logged in')
       const gitHubUserName = authStore.getGitHubUserName
       if (!gitHubUserName) throw new Error('GitHub username had to be retrieved')
+      purchaseStore.addPurchasing(`${user.uid}/${task_id}`)
       const functions = getFunctions(undefined, 'asia-northeast1')
       const purchaseTask = httpsCallable<PurchaseTaskRequest, PurchaseTaskResponse>(functions, 'purchaseTask')
-      const result = await purchaseTask({ task_id: context.params.value.id })
+      const result = await purchaseTask({ task_id: task_id })
+      // リアルタイムリスナーでpurchaseドキュメントの作成を待機
+      const purchaseRef = doc(context.$db, `users/${user.uid}/purchases`, task_id).withConverter(purchaseConverter)
+      const unsubscribe = onSnapshot(
+        purchaseRef,
+        (purchaseSnapshot) => {
+          if (purchaseSnapshot.exists()) {
+            console.log('purchase document created')
+            purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+            data.purchase = purchaseSnapshot.data()
+            unsubscribe()
+          }
+        },
+        (error) => {
+          console.log(error)
+          purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+          unsubscribe()
+        }
+      )
       console.log(result.data.message)
     }
-    return { data, purchaseTask }
+    return { data, signedIn, purchasing, purchase }
   },
 })
 </script>

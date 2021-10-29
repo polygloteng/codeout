@@ -59,6 +59,7 @@ export function assertPurchase(data: any): asserts data is Purchase {
   if (
     !(
       d?.task_ref instanceof DocumentReference &&
+      typeof d?.repo_url === 'string' &&
       typeof d?.point === 'number' &&
       d?.created instanceof Timestamp &&
       d?.updated instanceof Timestamp

@@ -17,6 +17,10 @@ export default class Auth extends VuexModule {
     return this.user != null
   }
 
+  public get getUser() {
+    return this.user
+  }
+
   public get getGitHubUserName() {
     return this.gitHubUserName
   }
