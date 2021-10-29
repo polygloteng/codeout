@@ -7,7 +7,7 @@ const plugin: Plugin = (context) => {
   auth.onAuthStateChanged((user) => {
     if (user) {
       authStore.setUser({
-        email: user.email ?? undefined,
+        uid: user.uid,
       })
     } else {
       authStore.setUser(null)

@@ -13,6 +13,11 @@ interface PurchaseTaskResponse {
   message: string
 }
 
+admin.initializeApp()
+admin.firestore().settings({
+  ignoreUndefinedProperties: true,
+})
+
 export const purchaseTask = functions
   .region('asia-northeast1')
   .https.onCall(async (req: PurchaseTaskRequest, context) => {
@@ -24,7 +29,6 @@ export const purchaseTask = functions
 
     const octokit = new Octokit({ auth: functions.config().github.token })
     const owner = functions.config().github.organization
-    admin.initializeApp()
 
     try {
       await admin.firestore().runTransaction(async (transaction) => {
@@ -34,6 +38,12 @@ export const purchaseTask = functions
         // 現時点ではとりあえずトランザクションが長くなってもGitHub APIのコール回数を少なくする方を優先する。
 
         functions.logger.info('transaction start')
+        const purchaseRef = admin
+          .firestore()
+          .doc(`users/${context.auth!.uid}/purchases/${req.task_id}`)
+          .withConverter(purchaseConverter)
+        const purchaseSnapshot = await transaction.get(purchaseRef)
+        if (purchaseSnapshot.exists) throw new functions.https.HttpsError('internal', 'Already purchased')
         const userRef = admin.firestore().doc(`users/${context.auth!.uid}`).withConverter(userConverter)
         const userSnapshot = await transaction.get(userRef)
         const taskRef = admin.firestore().doc(`tasks/${req.task_id}`).withConverter(taskConverter)
@@ -108,22 +118,16 @@ export const purchaseTask = functions
           throw error
         }
 
-        // 未購入の場合のみ購入処理を実行
-        const purchaseRef = admin
-          .firestore()
-          .doc(`users/${context.auth!.uid}/purchase/${req.task_id}`)
-          .withConverter(purchaseConverter)
-        const purchaseSnapshot = await transaction.get(purchaseRef)
-        if (!purchaseSnapshot.exists) {
-          transaction.update(userRef, { point: user.point - task.point })
-          const now = admin.firestore.Timestamp.now() // transaction.setではserverTimestampは使用不可のようである
-          transaction.set(purchaseRef, {
-            task_ref: taskRef,
-            point: task.point,
-            created: now,
-            updated: now,
-          })
-        }
+        // ポイントの減算処理と購入処理を実行
+        const now = admin.firestore.Timestamp.now() // transactionを使う場合はserverTimestampは使用不可のようである
+        transaction.update(userRef, { point: user.point - task.point, updated: now })
+        transaction.set(purchaseRef, {
+          task_ref: taskRef,
+          repo_url: `https://github.com/${owner}/${dstRepoName}`,
+          point: task.point,
+          created: now,
+          updated: now,
+        })
       })
     } catch (error) {
       functions.logger.info('error occurred in puchase transaction')

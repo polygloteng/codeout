@@ -20,8 +20,9 @@ service cloud.firestore {
   }
 
   function isValidPurchase(purchase) {
-    return purchase.size() == 4
+    return purchase.size() == 5
       && 'task_ref' in purchase && purchase.task_ref is path
+      && 'repo_url' in purchase && purchase.repo_url is string && purchase.repo_url.size() <= 128
       && 'point' in purchase && purchase.point is number
       && 'created' in purchase && purchase.created is timestamp
       && 'updated' in purchase && purchase.updated is timestamp
@@ -44,7 +45,7 @@ service cloud.firestore {
         && !exists(publicProfilePath(request.auth.uid))
         && existsAfter(publicProfilePath(request.auth.uid));
     }
-    match /users/{uid}/purchase/{task} {
+    match /users/{uid}/purchases/{task} {
       allow get: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid
         && isValidPurchase(request.resource.data);

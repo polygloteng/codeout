@@ -1,3 +1,3 @@
 export interface StoredUser {
-  email?: string
+  uid: string
 }
