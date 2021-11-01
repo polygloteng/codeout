@@ -5,9 +5,10 @@
 </template>
 
 <script lang="ts">
-import { getAuth, signInWithPopup, GithubAuthProvider } from 'firebase/auth'
+import { getAuth, signInWithPopup, GithubAuthProvider, getAdditionalUserInfo } from 'firebase/auth'
 import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
 import RequireAuth from '~/middleware/requireAuth'
+import { authStore } from '~/store'
 
 export default defineComponent({
   middleware: RequireAuth,
@@ -29,7 +30,10 @@ export default defineComponent({
       const provider = new GithubAuthProvider()
       const auth = getAuth()
       try {
-        await signInWithPopup(auth, provider)
+        const result = await signInWithPopup(auth, provider)
+        const additionalUserInfo = getAdditionalUserInfo(result)
+        if (!additionalUserInfo || !additionalUserInfo.username) throw new Error('failed to retrieve GitHub username')
+        authStore.setGitHubUserName(additionalUserInfo.username)
         router.push('/')
       } catch (error) {
         console.log(error.message)
@@ -40,5 +44,4 @@ export default defineComponent({
 })
 </script>
 
-<style>
-</style>
+<style></style>
