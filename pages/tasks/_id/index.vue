@@ -104,7 +104,6 @@ export default defineComponent({
     useAsync(async () => {
       const taskSnapshot = await getDoc(doc(context.$db, 'tasks', task_id).withConverter(taskConverter))
       if (taskSnapshot.exists()) {
-        console.log(taskSnapshot.data())
         data.task = taskSnapshot.data()
       } else {
         console.log('No such document!')
