@@ -19,6 +19,7 @@ export function assertUser(data: any): asserts data is User {
 export const userConverter: FirestoreDataConverter<User> = {
   fromFirestore(snapshot, options) {
     const data = snapshot.data(options)
+    data.id = snapshot.id
     assertUser(data)
     return data
   },
@@ -43,6 +44,7 @@ export function assertPublicProfile(data: any): asserts data is PublicProfile {
 export const publicProfileConverter: FirestoreDataConverter<PublicProfile> = {
   fromFirestore(snapshot, options) {
     const data = snapshot.data(options)
+    data.id = snapshot.id
     assertPublicProfile(data)
     return data
   },
@@ -73,6 +75,7 @@ export function assertTask(data: any): asserts data is Task {
 export const taskConverter: FirestoreDataConverter<Task> = {
   fromFirestore(snapshot, options) {
     const data = snapshot.data(options)
+    data.id = snapshot.id
     assertTask(data)
     return data
   },
@@ -98,6 +101,7 @@ export function assertPurchase(data: any): asserts data is Purchase {
 export const purchaseConverter: FirestoreDataConverter<Purchase> = {
   fromFirestore(snapshot) {
     const data = snapshot.data()
+    data.id = snapshot.id
     assertPurchase(data)
     return data as Purchase
   },

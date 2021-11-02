@@ -65,15 +65,11 @@ export default defineComponent({
       const querySnapshot = await getDocs(
         query(collection(context.$db, 'tasks').withConverter(taskConverter), orderBy('name'), limit(MAX_TASKS))
       )
-      querySnapshot.forEach((doc) => {
-        data.tasks.push(doc.data())
-        data.tasks[data.tasks.length - 1].id = doc.id
-      })
+      data.tasks = querySnapshot.docs.map((doc) => doc.data())
     })
     return { data }
   },
 })
 </script>
 
-<style>
-</style>
+<style></style>
