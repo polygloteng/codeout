@@ -13,6 +13,7 @@ const ERROR_MSG_PURCHASE_DOES_NOT_EXIST = 'purchase does not exist'
 const ERROR_MSG_PUBLIC_PROFILE_DOES_NOT_EXIST = 'publicProfile does not exist'
 const ERROR_MSG_TASK_ALREADY_COMPLETED = 'task has already been completed'
 const ERROR_MSG_UNEXPECTED = 'unexpected error occurred'
+const MSG_COMPLETED = 'completed'
 
 export const mergeHook = functions.region('asia-northeast1').https.onRequest(async (req, res) => {
   try {
@@ -105,7 +106,8 @@ export const mergeHook = functions.region('asia-northeast1').https.onRequest(asy
       transaction.update(purchaseRef, { task_completed: true, updated: now })
       transaction.update(publicProfileRef, { score: publicProfile.score + task.score, updated: now })
 
-      res.send('completed')
+      functions.logger.info(MSG_COMPLETED)
+      res.send(MSG_COMPLETED)
     })
   } catch (error) {
     functions.logger.error(JSON.stringify(error))
