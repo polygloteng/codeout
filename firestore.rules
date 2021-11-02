@@ -20,8 +20,9 @@ service cloud.firestore {
   }
 
   function isValidPurchase(purchase) {
-    return purchase.size() == 5
+    return purchase.size() == 6
       && 'task_ref' in purchase && purchase.task_ref is path
+      && 'task_completed' in purchase && purchase.task_completed is bool
       && 'repo_url' in purchase && purchase.repo_url is string && purchase.repo_url.size() <= 128
       && 'point' in purchase && purchase.point is number
       && 'created' in purchase && purchase.created is timestamp

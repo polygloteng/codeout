@@ -66,11 +66,11 @@ interface Data {
   purchase?: Purchase
 }
 
-interface PurchaseTaskRequest {
+interface PurchaseRequest {
   task_id: string
 }
 
-interface PurchaseTaskResponse {
+interface PurchaseResponse {
   message: string
 }
 
@@ -118,12 +118,12 @@ export default defineComponent({
     const purchase = async () => {
       const user = authStore.getUser
       if (!user) throw new Error('User must be logged in')
-      const gitHubUserName = authStore.getGitHubUserName
-      if (!gitHubUserName) throw new Error('GitHub username had to be retrieved')
+      const githubUserName = authStore.getGitHubUserName
+      if (!githubUserName) throw new Error('GitHub username had to be retrieved')
       purchaseStore.addPurchasing(`${user.uid}/${task_id}`)
       const functions = getFunctions(undefined, 'asia-northeast1')
-      const purchaseTask = httpsCallable<PurchaseTaskRequest, PurchaseTaskResponse>(functions, 'purchaseTask')
-      const result = await purchaseTask({ task_id: task_id })
+      const purchase = httpsCallable<PurchaseRequest, PurchaseResponse>(functions, 'purchase')
+      const result = await purchase({ task_id: task_id })
       // リアルタイムリスナーでpurchaseドキュメントの作成を待機
       const purchaseRef = doc(context.$db, `users/${user.uid}/purchases`, task_id).withConverter(purchaseConverter)
       const unsubscribe = onSnapshot(

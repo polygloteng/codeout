@@ -1,11 +1,12 @@
 import { FirestoreDataConverter, DocumentReference, Timestamp } from '@google-cloud/firestore'
-import { User, Task, Purchase } from '../types/db'
+import { User, PublicProfile, Task, Purchase } from '../types/db'
 
 export function assertUser(data: any): asserts data is User {
   const d = data as Partial<User>
   if (
     !(
       typeof d?.github_uid === 'string' &&
+      typeof d?.github_username === 'string' &&
       typeof d?.point === 'number' &&
       d?.created instanceof Timestamp &&
       d?.updated instanceof Timestamp
@@ -18,10 +19,36 @@ export function assertUser(data: any): asserts data is User {
 export const userConverter: FirestoreDataConverter<User> = {
   fromFirestore(snapshot) {
     const data = snapshot.data()
+    data.id = snapshot.id
     assertUser(data)
     return data as User
   },
   toFirestore: (model: User) => model,
+}
+
+export function assertPublicProfile(data: any): asserts data is PublicProfile {
+  const d = data as Partial<PublicProfile>
+  if (
+    !(
+      typeof d?.nickname === 'string' &&
+      typeof d?.thumbnail_url === 'string' &&
+      typeof d?.score === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not PublicProfile type')
+  }
+}
+
+export const publicProfileConverter: FirestoreDataConverter<PublicProfile> = {
+  fromFirestore(snapshot) {
+    const data = snapshot.data()
+    data.id = snapshot.id
+    assertPublicProfile(data)
+    return data as PublicProfile
+  },
+  toFirestore: (model: PublicProfile) => model,
 }
 
 export function assertTask(data: any): asserts data is Task {
@@ -48,6 +75,7 @@ export function assertTask(data: any): asserts data is Task {
 export const taskConverter: FirestoreDataConverter<Task> = {
   fromFirestore(snapshot) {
     const data = snapshot.data()
+    data.id = snapshot.id
     assertTask(data)
     return data as Task
   },
@@ -59,6 +87,7 @@ export function assertPurchase(data: any): asserts data is Purchase {
   if (
     !(
       d?.task_ref instanceof DocumentReference &&
+      typeof d?.task_completed === 'boolean' &&
       typeof d?.repo_url === 'string' &&
       typeof d?.point === 'number' &&
       d?.created instanceof Timestamp &&
@@ -72,6 +101,7 @@ export function assertPurchase(data: any): asserts data is Purchase {
 export const purchaseConverter: FirestoreDataConverter<Purchase> = {
   fromFirestore(snapshot) {
     const data = snapshot.data()
+    data.id = snapshot.id
     assertPurchase(data)
     return data as Purchase
   },

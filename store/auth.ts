@@ -11,7 +11,7 @@ type PossiblyString = string | null
 })
 export default class Auth extends VuexModule {
   private user: PossiblyUser = null
-  private gitHubUserName: PossiblyString = null
+  private githubUserName: PossiblyString = null
 
   public get isSignedIn() {
     return this.user != null
@@ -22,7 +22,7 @@ export default class Auth extends VuexModule {
   }
 
   public get getGitHubUserName() {
-    return this.gitHubUserName
+    return this.githubUserName
   }
 
   @Mutation
@@ -31,7 +31,7 @@ export default class Auth extends VuexModule {
   }
 
   @Mutation
-  public setGitHubUserName(gitHubUserName: PossiblyString) {
-    this.gitHubUserName = gitHubUserName
+  public setGitHubUserName(githubUserName: PossiblyString) {
+    this.githubUserName = githubUserName
   }
 }

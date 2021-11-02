@@ -36,6 +36,7 @@ export interface Task {
 export interface Purchase {
   id?: string
   task_ref: DocumentReference<Task>
+  task_completed: boolean
   repo_url: string
   point: number
   created: Timestamp
