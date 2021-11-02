@@ -18,10 +18,9 @@ export function assertUser(data: any): asserts data is User {
 
 export const userConverter: FirestoreDataConverter<User> = {
   fromFirestore(snapshot) {
-    const data = snapshot.data()
-    data.id = snapshot.id
+    const data = { id: snapshot.id, ...snapshot.data() }
     assertUser(data)
-    return data as User
+    return data
   },
   toFirestore: (model: User) => model,
 }
@@ -43,10 +42,9 @@ export function assertPublicProfile(data: any): asserts data is PublicProfile {
 
 export const publicProfileConverter: FirestoreDataConverter<PublicProfile> = {
   fromFirestore(snapshot) {
-    const data = snapshot.data()
-    data.id = snapshot.id
+    const data = { id: snapshot.id, ...snapshot.data() }
     assertPublicProfile(data)
-    return data as PublicProfile
+    return data
   },
   toFirestore: (model: PublicProfile) => model,
 }
@@ -74,10 +72,9 @@ export function assertTask(data: any): asserts data is Task {
 
 export const taskConverter: FirestoreDataConverter<Task> = {
   fromFirestore(snapshot) {
-    const data = snapshot.data()
-    data.id = snapshot.id
+    const data = { id: snapshot.id, ...snapshot.data() }
     assertTask(data)
-    return data as Task
+    return data
   },
   toFirestore: (model: Task) => model,
 }
@@ -100,10 +97,9 @@ export function assertPurchase(data: any): asserts data is Purchase {
 
 export const purchaseConverter: FirestoreDataConverter<Purchase> = {
   fromFirestore(snapshot) {
-    const data = snapshot.data()
-    data.id = snapshot.id
+    const data = { id: snapshot.id, ...snapshot.data() }
     assertPurchase(data)
-    return data as Purchase
+    return data
   },
   toFirestore: (model: Purchase) => model,
 }

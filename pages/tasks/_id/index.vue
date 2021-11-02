@@ -74,6 +74,10 @@ interface PurchaseResponse {
   message: string
 }
 
+const makePurchasingKey = (user_id: string, task_id: string): string => {
+  return `${user_id}/${task_id}`
+}
+
 export default defineComponent({
   setup() {
     const context = useContext()
@@ -87,7 +91,7 @@ export default defineComponent({
       const user = authStore.getUser
       if (!user) return false
       const purchasingList = purchaseStore.getPurchasingList
-      return `${user.uid}/${task_id}` in purchasingList
+      return makePurchasingKey(user.uid, task_id) in purchasingList
     })
     const refreshPurchaseStates = async () => {
       const user = authStore.getUser
@@ -95,9 +99,13 @@ export default defineComponent({
         const purchaseSnapshot = await getDoc(
           doc(context.$db, `users/${user.uid}/purchases`, task_id).withConverter(purchaseConverter)
         )
+        const purchasingKey = makePurchasingKey(user.uid, task_id)
         if (purchaseSnapshot.exists()) {
-          purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+          purchaseStore.deletePurchasing(purchasingKey)
           data.purchase = purchaseSnapshot.data()
+        } else if (purchasing) {
+          // リアルタイムリスナーが呼び出されない場合への対応
+          purchaseStore.deletePurchasing(purchasingKey)
         }
       }
     }
@@ -118,9 +126,10 @@ export default defineComponent({
     const purchase = async () => {
       const user = authStore.getUser
       if (!user) throw new Error('User must be logged in')
+      const purchasingKey = makePurchasingKey(user.uid, task_id)
       const githubUserName = authStore.getGitHubUserName
       if (!githubUserName) throw new Error('GitHub username had to be retrieved')
-      purchaseStore.addPurchasing(`${user.uid}/${task_id}`)
+      purchaseStore.addPurchasing(purchasingKey)
       const functions = getFunctions(undefined, 'asia-northeast1')
       const purchase = httpsCallable<PurchaseRequest, PurchaseResponse>(functions, 'purchase')
       const result = await purchase({ task_id: task_id })
@@ -131,14 +140,14 @@ export default defineComponent({
         (purchaseSnapshot) => {
           if (purchaseSnapshot.exists()) {
             console.log('purchase document created')
-            purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+            purchaseStore.deletePurchasing(purchasingKey)
             data.purchase = purchaseSnapshot.data()
             unsubscribe()
           }
         },
         (error) => {
           console.log(error)
-          purchaseStore.deletePurchasing(`${user.uid}/${task_id}`)
+          purchaseStore.deletePurchasing(purchasingKey)
           unsubscribe()
         }
       )
