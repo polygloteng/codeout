@@ -29,8 +29,7 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
       // (rate limitに抵触してAPIが実行できなくなる可能性がある)
       // userドキュメントとtaskドキュメントは滅多にupdateされないので、
       // 現時点ではとりあえずトランザクションが長くなってもGitHub APIのコール回数を少なくする方を優先する。
-
-      functions.logger.info('transaction start')
+      functions.logger.info('purchase transaction start')
       const purchaseRef = admin
         .firestore()
         .doc(`users/${context.auth!.uid}/purchases/${req.task_id}`)
@@ -65,8 +64,8 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
         functions.logger.info(JSON.stringify(res))
         await new Promise((resolve) => setTimeout(resolve, 1000)) // for avoiding secondary rate limits
       } catch (error) {
-        functions.logger.info('error occurred in cloning repo API')
-        functions.logger.info(JSON.stringify(error))
+        functions.logger.error('error occurred in cloning repo API')
+        functions.logger.error(JSON.stringify(error))
         if (error instanceof RequestError && error.status === 422) {
           // 既にリポジトリがclone済みの場合は422エラーが返されるのでこの場合は何もしない
         } else {
@@ -92,7 +91,7 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
         functions.logger.info(JSON.stringify(res))
         await new Promise((resolve) => setTimeout(resolve, 1000)) // for avoiding secondary rate limits
       } catch (error) {
-        functions.logger.info('error occurred in protecting branch API for main branch')
+        functions.logger.error('error occurred in protecting branch API for main branch')
         throw error
       }
 
@@ -107,7 +106,7 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
         functions.logger.info('inviting collaborator API call succeeded')
         functions.logger.info(JSON.stringify(res))
       } catch (error) {
-        functions.logger.info('error occurred in inviting collaborator API')
+        functions.logger.error('error occurred in inviting collaborator API')
         throw error
       }
 
@@ -124,8 +123,8 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
       })
     })
   } catch (error) {
-    functions.logger.info('error occurred in puchase transaction')
-    functions.logger.info(JSON.stringify(error))
+    functions.logger.error('error occurred in puchase transaction')
+    functions.logger.error(JSON.stringify(error))
     if (error instanceof functions.https.HttpsError) {
       throw error
     } else {
