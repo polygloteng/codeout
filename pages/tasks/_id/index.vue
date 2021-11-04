@@ -146,7 +146,7 @@ export default defineComponent({
           }
         },
         (error) => {
-          console.log(error)
+          console.error(error)
           purchaseStore.deletePurchasing(purchasingKey)
           unsubscribe()
         }
