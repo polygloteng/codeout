@@ -18,7 +18,7 @@
       ></v-text-field>
       <v-toolbar-items v-if="signedIn" class="d-none d-md-block">
         <v-btn text to="/mypage">マイページ</v-btn>
-        <v-btn text @click="signOut">サインアウト</v-btn>
+        <v-btn text @click="signOutEx">サインアウト</v-btn>
       </v-toolbar-items>
       <v-toolbar-items v-else class="d-none d-md-block">
         <v-btn text to="/signin">サインイン</v-btn>
@@ -36,7 +36,7 @@
               <v-list-item-title>マイページ</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="signOut">
+          <v-list-item @click="signOutEx">
             <v-list-item-content>
               <v-list-item-title>ログアウト</v-list-item-title>
             </v-list-item-content>
@@ -66,8 +66,8 @@
 </template>
 
 <script lang="ts">
-import { getAuth } from 'firebase/auth'
 import { defineComponent, useContext, reactive, computed, useRouter } from '@nuxtjs/composition-api'
+import { useAuth } from '~/composables/auth'
 import { authStore } from '~/store'
 
 interface Support {
@@ -89,18 +89,17 @@ interface Data {
 export default defineComponent({
   setup() {
     const router = useRouter()
+    const { signOut } = useAuth()
     const data = reactive<Data>({
       clipped: false,
       drawer: false,
     })
-    const signOut = () => {
-      const auth = getAuth()
-      auth.signOut()
-      authStore.setGitHubUserName(null)
+    const signOutEx = () => {
+      signOut()
       router.push('/')
     }
     const signedIn = computed(() => authStore.isSignedIn)
-    return { data, signedIn, signOut }
+    return { data, signedIn, signOutEx }
   },
 })
 </script>

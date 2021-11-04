@@ -5,10 +5,8 @@
 </template>
 
 <script lang="ts">
-import { getAuth, signInWithPopup, GithubAuthProvider, getAdditionalUserInfo } from 'firebase/auth'
 import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
-import { onUserSingedIn, retrieveGitHubUserInfo, createUserIfNotExist } from '~/lib/auth'
-import { authStore } from '~/store'
+import { useAuth, createUserIfNotExist } from '~/composables/auth'
 import RequireAuth from '~/middleware/requireAuth'
 
 export default defineComponent({
@@ -16,19 +14,16 @@ export default defineComponent({
   setup() {
     const context = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
-    const auth = getAuth()
-    onBeforeMount(() => onUserSingedIn(auth, () => context.redirect('/')))
+    const { signIn, signOut, onUserSingedIn } = useAuth()
+    onBeforeMount(() => onUserSingedIn(() => context.redirect('/')))
     const signUp = async () => {
       try {
-        const result = await signInWithPopup(auth, new GithubAuthProvider())
-        const firebaseUser = result.user
-        const githubUserInfo = retrieveGitHubUserInfo(firebaseUser, getAdditionalUserInfo(result))
-        await createUserIfNotExist(context.$db, firebaseUser.uid, githubUserInfo)
-        authStore.setGitHubUserName(githubUserInfo.username)
+        const userInfo = await signIn()
+        await createUserIfNotExist(context.$db, userInfo)
         router.push('/')
       } catch (error) {
         console.error('sign up failed,', error)
-        auth.signOut()
+        signOut()
       }
     }
     return { signUp }
