@@ -7,6 +7,7 @@
 <script lang="ts">
 import { getAuth, signInWithPopup, GithubAuthProvider, getAdditionalUserInfo } from 'firebase/auth'
 import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
+import { onUserSingedIn, retrieveGitHubUserInfo } from '~/lib/auth'
 import RequireAuth from '~/middleware/requireAuth'
 import { authStore } from '~/store'
 
@@ -16,27 +17,15 @@ export default defineComponent({
     const context = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
     const auth = getAuth()
-    onBeforeMount(() => {
-      // required in case of direct access while the user is signed in
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          context.redirect('/')
-        }
-        // after the page is displayed, page transition will be monitored by the middleware, so unsubscribe it
-        unsubscribe()
-      })
-    })
+    onBeforeMount(() => onUserSingedIn(auth, () => context.redirect('/')))
     const signIn = async () => {
-      const provider = new GithubAuthProvider()
-      const auth = getAuth()
       try {
-        const result = await signInWithPopup(auth, provider)
-        const additionalUserInfo = getAdditionalUserInfo(result)
-        if (!additionalUserInfo || !additionalUserInfo.username) throw new Error('failed to retrieve GitHub username')
-        authStore.setGitHubUserName(additionalUserInfo.username)
+        const result = await signInWithPopup(getAuth(), new GithubAuthProvider())
+        const githubUserInfo = retrieveGitHubUserInfo(result.user, getAdditionalUserInfo(result))
+        authStore.setGitHubUserName(githubUserInfo.username)
         router.push('/')
       } catch (error) {
-        console.log(error.message)
+        console.error('sign in failed,', error)
       }
     }
     return { signIn }
