@@ -14,7 +14,7 @@
       <v-row justify="center">
         <v-col cols="12" xl="8">
           <v-row>
-            <v-col v-for="task in data.tasks" :key="task.name" cols="12" sm="6" md="4">
+            <v-col v-for="task in tasks" :key="task.name" cols="12" sm="6" md="4">
               <v-card class="pa-2" outlined tile hover :to="'/tasks/' + task.id">
                 <v-img height="250" :src="require('~/assets/study.png')"></v-img>
                 <v-card-title>{{ task.name }}</v-card-title>
@@ -44,30 +44,16 @@
 </template>
 
 <script lang="ts">
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
-import { defineComponent, reactive, useContext, useAsync } from '@nuxtjs/composition-api'
-import { Task } from '~/types/db'
-import { taskConverter } from '~/lib/converters'
-
-interface Data {
-  tasks: Task[]
-}
+import { defineComponent, useContext } from '@nuxtjs/composition-api'
+import { useTasks } from '~/composables/task'
 
 const MAX_TASKS = 9
 
 export default defineComponent({
   setup() {
     const context = useContext()
-    const data = reactive<Data>({
-      tasks: [],
-    })
-    useAsync(async () => {
-      const querySnapshot = await getDocs(
-        query(collection(context.$db, 'tasks').withConverter(taskConverter), orderBy('name'), limit(MAX_TASKS))
-      )
-      data.tasks = querySnapshot.docs.map((doc) => doc.data())
-    })
-    return { data }
+    const { tasks } = useTasks(context, MAX_TASKS)
+    return { tasks }
   },
 })
 </script>
