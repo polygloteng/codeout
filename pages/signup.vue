@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
+import { defineComponent, useContext, useRouter } from '@nuxtjs/composition-api'
 import { useAuth, createUserIfNotExist } from '~/composables/auth'
 import RequireAuth from '~/middleware/requireAuth'
 
@@ -15,11 +15,11 @@ export default defineComponent({
     const context = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
     const { signIn, signOut, onUserSingedIn } = useAuth()
-    onBeforeMount(() => onUserSingedIn(() => context.redirect('/')))
+    onUserSingedIn(() => context.redirect('/'))
     const signUp = async () => {
       try {
         const userInfo = await signIn()
-        await createUserIfNotExist(context.$db, userInfo)
+        await createUserIfNotExist(context, userInfo)
         router.push('/')
       } catch (error) {
         console.error('sign up failed,', error)

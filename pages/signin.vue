@@ -5,10 +5,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext, useRouter, onBeforeMount } from '@nuxtjs/composition-api'
+import { defineComponent, useContext, useRouter } from '@nuxtjs/composition-api'
 import { useAuth } from '~/composables/auth'
 import RequireAuth from '~/middleware/requireAuth'
-import { authStore } from '~/store'
 
 export default defineComponent({
   middleware: RequireAuth,
@@ -16,7 +15,7 @@ export default defineComponent({
     const { redirect } = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
     const { signIn, onUserSingedIn } = useAuth()
-    onBeforeMount(() => onUserSingedIn(() => redirect('/')))
+    onUserSingedIn(() => redirect('/'))
     const signInEx = async () => {
       try {
         await signIn()
