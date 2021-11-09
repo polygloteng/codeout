@@ -1,4 +1,4 @@
-import { onBeforeMount, computed } from '@nuxtjs/composition-api'
+import { onBeforeMount, computed, InjectionKey, Ref, inject } from '@nuxtjs/composition-api'
 import {
   User as FirebaseUser,
   AdditionalUserInfo,
@@ -8,8 +8,9 @@ import {
   getAdditionalUserInfo,
 } from 'firebase/auth'
 import { Firestore, doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
+import { UserInfo } from '~/types/auth'
 import { userConverter, publicProfileConverter } from '~/lib/converters'
-import { authStore } from '~/store'
+import { CurrentUser } from '~/lib/constants'
 
 const retrieveUserInfo = (firebaseUser: FirebaseUser, additionalUserInfo: AdditionalUserInfo | null): UserInfo => {
   // メールアドレスが登録されていないケースは発生しないと思われるが一応チェックしておく
@@ -35,6 +36,10 @@ const retrieveUserInfo = (firebaseUser: FirebaseUser, additionalUserInfo: Additi
 }
 
 export const useAuth = () => {
+  const currentUser = inject(CurrentUser)
+  if (currentUser === undefined) {
+    throw new Error('currentUser is not provided')
+  }
   const auth = getAuth()
   const provider = new GithubAuthProvider()
   const signIn = () => {
@@ -44,7 +49,6 @@ export const useAuth = () => {
         const firebaseUser = result.user
         const additionalUserInfo = getAdditionalUserInfo(result)
         const userInfo = retrieveUserInfo(firebaseUser, additionalUserInfo)
-        authStore.setGitHubUserName(userInfo.githubUserName)
         resolve(userInfo)
       } catch (error) {
         reject(error)
@@ -53,7 +57,6 @@ export const useAuth = () => {
   }
   const signOut = () => {
     auth.signOut()
-    authStore.setGitHubUserName(null)
   }
   const onUserSingedIn = (callback: Function) => {
     onBeforeMount(() => {
@@ -68,8 +71,8 @@ export const useAuth = () => {
       })
     })
   }
-  const signedIn = computed(() => authStore.isSignedIn)
-  return { signIn, signOut, onUserSingedIn, signedIn }
+
+  return { currentUser, signIn, signOut, onUserSingedIn }
 }
 
 export const createUserIfNotExist = async ({ $db }: { $db: Firestore }, userInfo: UserInfo): Promise<void> => {

@@ -1,7 +1,8 @@
-import { ref, computed, watch, onMounted } from '@nuxtjs/composition-api'
+import { ref, computed, onBeforeMount } from '@nuxtjs/composition-api'
 import { Firestore, doc, getDoc, onSnapshot, DocumentReference } from 'firebase/firestore'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { authStore, purchaseStore } from '~/store'
+import { purchaseStore } from '~/store'
+import { UserInfo } from '~/types/auth'
 import { Purchase } from '~/types/db'
 import { purchaseConverter } from '~/lib/converters'
 
@@ -17,37 +18,29 @@ const makePurchaseRef = ($db: Firestore, user_id: string, task_id: string): Docu
   return doc($db, `users/${user_id}/purchases`, task_id).withConverter(purchaseConverter)
 }
 
-export const usePurchase = ({ $db }: { $db: Firestore }, task_id: string) => {
+export const usePurchase = ({ $db }: { $db: Firestore }, currentUser: UserInfo | null, task_id: string) => {
   const isPurchasing = computed(() => {
-    const user = authStore.getUser
-    if (!user) return false
+    if (!currentUser) return false
     const purchasingList = purchaseStore.getPurchasingList
-    const purchaseRef = makePurchaseRef($db, user.uid, task_id)
+    const purchaseRef = makePurchaseRef($db, currentUser.systemUserId, task_id)
     return purchaseRef.path in purchasingList
   })
 
   const purchase = ref<Purchase>()
-  const refreshPurchaseStates = async () => {
-    const user = authStore.getUser
-    if (user) {
-      const purchaseRef = makePurchaseRef($db, user.uid, task_id)
+  onBeforeMount(async () => {
+    if (currentUser) {
+      const purchaseRef = makePurchaseRef($db, currentUser.systemUserId, task_id)
       const purchaseSnapshot = await getDoc(purchaseRef)
       if (purchaseSnapshot.exists()) {
         purchaseStore.deletePurchasing(purchaseRef.path)
         purchase.value = purchaseSnapshot.data()
       }
     }
-  }
-  onMounted(() => refreshPurchaseStates())
-  const signedIn = computed(() => authStore.isSignedIn)
-  watch(signedIn, () => refreshPurchaseStates())
+  })
 
   const doPurchase = async () => {
-    const user = authStore.getUser
-    if (!user) throw new Error('User must be logged in')
-    const githubUserName = authStore.getGitHubUserName
-    if (!githubUserName) throw new Error('GitHub username had to be retrieved')
-    const purchaseRef = makePurchaseRef($db, user.uid, task_id)
+    if (!currentUser) throw new Error('User must be logged in')
+    const purchaseRef = makePurchaseRef($db, currentUser.systemUserId, task_id)
     purchaseStore.addPurchasing(purchaseRef.path)
     const functions = getFunctions(undefined, 'asia-northeast1')
     const purchaseFunc = httpsCallable<PurchaseRequest, PurchaseResponse>(functions, 'purchase')
