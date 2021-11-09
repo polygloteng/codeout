@@ -1,4 +1,4 @@
-interface UserInfo {
+export interface UserInfo {
   systemUserId: string
   githubUserId: string
   githubUserName: string
