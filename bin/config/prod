@@ -3,3 +3,4 @@
 # General settings
 readonly Env=prod
 readonly Project=codeout-prod
+readonly Region=asia-northeast1

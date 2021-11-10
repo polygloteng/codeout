@@ -5,3 +5,6 @@ readonly CompanyId=polygloteng
 
 # Environments
 readonly Envs="dev,prod"
+
+# Cloud Run
+readonly CloudRunServiceName=server

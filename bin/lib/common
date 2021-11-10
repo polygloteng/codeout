@@ -34,4 +34,17 @@ function setup_constants() {
 
   local config_file_path=${config_dir_path}/${env}
   . "${config_file_path}"
+
+  local secret="${config_dir_path}/.secret"
+  if [[ -f "${secret}" ]]; then
+    . "${secret}"
+  fi
+
+  readonly FirebaseApiKey="FirebaseApiKey_${env}"
+  readonly FirebaseAuthDomain="FirebaseAuthDomain_${env}"
+  readonly FirebaseProjectId="FirebaseProjectId_${env}"
+  readonly FirebaseStorageBucket="FirebaseStorageBucket_${env}"
+  readonly FirebaseMessagingSenderId="FirebaseMessagingSenderId_${env}"
+  readonly FirebaseAppId="FirebaseAppId_${env}"
+  readonly FirebaseMeasurementId="FirebaseMeasurementId_${env}"
 }

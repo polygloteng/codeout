@@ -5,7 +5,7 @@ set -euo pipefail
 function deploy() {
   firebase deploy \
     --project ${Project} \
-    --only functions
+    --only firestore
 }
 
 function main() {
