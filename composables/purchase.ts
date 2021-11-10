@@ -44,9 +44,14 @@ export const usePurchase = ({ $db }: { $db: Firestore }, currentUser: UserInfo |
     purchaseStore.addPurchasing(purchaseRef.path)
     const functions = getFunctions(undefined, 'asia-northeast1')
     const purchaseFunc = httpsCallable<PurchaseRequest, PurchaseResponse>(functions, 'purchase')
-    const result = await purchaseFunc({ task_id: task_id })
-    startListener(purchaseRef)
-    console.log(result.data.message)
+    try {
+      const result = await purchaseFunc({ task_id: task_id })
+      console.log(result.data.message)
+      startListener(purchaseRef)
+    } catch (error) {
+      purchaseStore.deletePurchasing(purchaseRef.path)
+      console.error(error)
+    }
   }
   const startListener = (purchaseRef: DocumentReference<Purchase>) => {
     const unsubscribe = onSnapshot(

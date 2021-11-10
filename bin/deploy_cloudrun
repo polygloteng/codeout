@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function build() {
+  gcloud builds submit \
+    --project ${Project} \
+    --config cloudbuild.yaml \
+    --substitutions _IMAGE_NAME=${CloudRunServiceName}
+}
+
+function deploy() {
+  local api_key
+  api_key=$(eval echo '$'${FirebaseApiKey})
+  local auth_domain
+  auth_domain=$(eval echo '$'${FirebaseAuthDomain})
+  local project_id
+  project_id=$(eval echo '$'${FirebaseProjectId})
+  local storage_bucket
+  storage_bucket=$(eval echo '$'${FirebaseStorageBucket})
+  local messaging_sender_id
+  messaging_sender_id=$(eval echo '$'${FirebaseMessagingSenderId})
+  local app_id
+  app_id=$(eval echo '$'${FirebaseAppId})
+  local measurement_id
+  measurement_id=$(eval echo '$'${FirebaseMeasurementId})
+
+  gcloud run deploy ${CloudRunServiceName} \
+    --project ${Project} \
+    --region ${Region} \
+    --set-env-vars FIREBASE_API_KEY=${api_key} \
+    --set-env-vars FIREBASE_AUTH_DOMAIN=${auth_domain} \
+    --set-env-vars FIREBASE_PROJECT_ID=${project_id} \
+    --set-env-vars FIREBASE_STORAGE_BUCKET=${storage_bucket} \
+    --set-env-vars FIREBASE_MESSAGING_SENDER_ID=${messaging_sender_id} \
+    --set-env-vars FIREBASE_APP_ID=${app_id} \
+    --set-env-vars FIREBASE_MEASUREMENT_ID=${measurement_id} \
+    --set-env-vars TZ=Asia/Tokyo \
+    --platform managed \
+    --no-allow-unauthenticated \
+    --image gcr.io/${Project}/${CloudRunServiceName} \
+    --quiet
+}
+
+function main() {
+  local env="$1"
+  local cwd
+  cwd="$(cd "$(dirname "$0")" && pwd)"
+  . ${cwd}/lib/common
+  check_usage
+  setup_constants "${env}" "${cwd}"
+
+  build
+  deploy
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi
