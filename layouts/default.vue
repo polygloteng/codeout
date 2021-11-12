@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar color="white" app clipped-right>
       <router-link to="/">
-        <v-img :src="require('~/assets/logo.png')" contain max-width="90"></v-img>
+        <v-img src="/images/logo.png" contain max-width="90"></v-img>
       </router-link>
       <v-spacer></v-spacer>
       <v-text-field
