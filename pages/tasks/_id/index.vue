@@ -12,7 +12,7 @@
                 style="border: 2px solid #cccccc"
                 class="mx-auto mt-10"
                 max-width="100%"
-                :src="require('~/assets/study.png')"
+                src="/images/study.png"
               ></v-img>
             </client-only>
           </div>
