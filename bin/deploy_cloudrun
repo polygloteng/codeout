@@ -35,9 +35,11 @@ function deploy() {
     --set-env-vars FIREBASE_MESSAGING_SENDER_ID=${messaging_sender_id} \
     --set-env-vars FIREBASE_APP_ID=${app_id} \
     --set-env-vars FIREBASE_MEASUREMENT_ID=${measurement_id} \
+    --set-env-vars ASSETS_DOMAIN=${AssetsDomain} \
     --set-env-vars TZ=Asia/Tokyo \
     --platform managed \
     --no-allow-unauthenticated \
+    --ingress internal-and-cloud-load-balancing \
     --image gcr.io/${Project}/${CloudRunServiceName} \
     --quiet
 }

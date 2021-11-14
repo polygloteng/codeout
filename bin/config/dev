@@ -4,3 +4,6 @@
 readonly Env=dev
 readonly Project=codeout-dev
 readonly Region=asia-northeast1
+
+# Assets
+readonly AssetsDomain=https://codeout-dev.web.app

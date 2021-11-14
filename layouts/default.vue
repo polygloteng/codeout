@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar color="white" app clipped-right>
       <router-link to="/">
-        <v-img src="/images/logo.png" contain max-width="90"></v-img>
+        <v-img :src="`${$config.assetsDomain}/images/logo.png`" contain max-width="90"></v-img>
       </router-link>
       <v-spacer></v-spacer>
       <v-text-field
@@ -91,6 +91,18 @@ interface Data {
 }
 
 export default defineComponent({
+  head() {
+    return {
+      link: [
+        {
+          hid: 'icon',
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: `${process.env.ASSETS_DOMAIN}/favicon.ico`,
+        },
+      ],
+    }
+  },
   setup() {
     const data = reactive<Data>({
       clipped: false,

@@ -14,9 +14,6 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' }
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -93,5 +90,6 @@ export default {
       appId: process.env.FIREBASE_APP_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
     },
+    assetsDomain: process.env.ASSETS_DOMAIN,
   },
 }
