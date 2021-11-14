@@ -16,7 +16,7 @@
           <v-row>
             <v-col v-for="task in tasks" :key="task.name" cols="12" sm="6" md="4">
               <v-card class="pa-2" outlined tile hover :to="'/tasks/' + task.id">
-                <v-img height="250" src="/images/study.png"></v-img>
+                <v-img height="250" :src="`${$config.assetsDomain}/images/study.png`"></v-img>
                 <v-card-title>{{ task.name }}</v-card-title>
                 <v-card-text>
                   <v-row align="center" class="mx-0">
