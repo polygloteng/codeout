@@ -14,8 +14,8 @@ export default defineComponent({
   setup() {
     const { redirect } = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
-    const { signIn, onUserSingedIn } = useAuth()
-    onUserSingedIn(() => redirect('/'))
+    const { signIn, onUserSignedInStateSettled } = useAuth()
+    onUserSignedInStateSettled({ signedInCallback: () => redirect('/') })
     const signInEx = async () => {
       try {
         await signIn()

@@ -58,13 +58,22 @@ export const useAuth = () => {
   const signOut = () => {
     auth.signOut()
   }
-  const onUserSingedIn = (callback: Function) => {
+  const onUserSignedInStateSettled = ({
+    signedInCallback,
+    notSignedInCallback,
+  }: {
+    signedInCallback?: Function
+    notSignedInCallback?: Function
+  }) => {
     onBeforeMount(() => {
       // required in case of direct access while the user is signed in
       const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
         if (firebaseUser) {
-          console.log('auth state changed, now user signed in')
-          callback()
+          console.log('auth state changed, user signed in')
+          if (signedInCallback) signedInCallback()
+        } else {
+          console.log('auth state changed, user not signed in')
+          if (notSignedInCallback) notSignedInCallback()
         }
         // after the page is displayed, page transition will be monitored by the middleware, so unsubscribe it
         unsubscribe()
@@ -72,7 +81,7 @@ export const useAuth = () => {
     })
   }
 
-  return { currentUser, signIn, signOut, onUserSingedIn }
+  return { currentUser, signIn, signOut, onUserSignedInStateSettled }
 }
 
 export const createUserIfNotExist = async ({ $db }: { $db: Firestore }, userInfo: UserInfo): Promise<void> => {
