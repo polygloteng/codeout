@@ -13,15 +13,6 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "server",
-          "region": "asia-northeast1"
-        }
-      }
     ]
   }
 }
