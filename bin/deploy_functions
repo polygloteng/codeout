@@ -2,6 +2,19 @@
 
 set -euo pipefail
 
+function setup_config() {
+  local github_webhook_secret
+  github_webhook_secret=$(eval echo '$'${GitHubWebhookSecret})
+  local github_token
+  github_token=$(eval echo '$'${GitHubToken})
+
+  firebase functions:config:set \
+    --project ${Project} \
+    github.webhook.secret=${github_webhook_secret} \
+    github.token=${github_token} \
+    github.organization=${GitHubOrganization}
+}
+
 function deploy() {
   firebase deploy \
     --project ${Project} \
@@ -16,6 +29,7 @@ function main() {
   check_usage
   setup_constants "${env}" "${cwd}"
 
+  setup_config
   deploy
 }
 

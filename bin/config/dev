@@ -7,3 +7,6 @@ readonly Region=asia-northeast1
 
 # Assets
 readonly AssetsDomain=https://codeout-dev.web.app
+
+# GitHub
+readonly GitHubOrganization=zskclassroom01
