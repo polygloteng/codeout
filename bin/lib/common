@@ -47,4 +47,7 @@ function setup_constants() {
   readonly FirebaseMessagingSenderId="FirebaseMessagingSenderId_${env}"
   readonly FirebaseAppId="FirebaseAppId_${env}"
   readonly FirebaseMeasurementId="FirebaseMeasurementId_${env}"
+
+  readonly GitHubWebhookSecret="GitHubWebhookSecret_${env}"
+  readonly GitHubToken="GitHubToken_${env}"
 }

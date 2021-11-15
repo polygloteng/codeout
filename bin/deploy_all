@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function main() {
+  local env="$1"
+  local cwd
+  cwd="$(cd "$(dirname "$0")" && pwd)"
+  . ${cwd}/lib/common
+  check_usage
+  setup_constants "${env}" "${cwd}"
+
+  ${cwd}/deploy_firestore "${env}"
+  ${cwd}/deploy_functions "${env}"
+  ${cwd}/deploy_cloudrun "${env}"
+  ${cwd}/deploy_hosting "${env}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi
