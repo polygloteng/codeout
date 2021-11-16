@@ -83,7 +83,10 @@ export function assertPurchase(data: any): asserts data is Purchase {
   const d = data as Partial<Purchase>
   if (
     !(
-      d?.task_ref instanceof DocumentReference &&
+      typeof d?.task === 'object' &&
+      d?.task.ref instanceof DocumentReference &&
+      typeof d?.task.name === 'string' &&
+      typeof d?.task.thumbnail_url === 'string' &&
       typeof d?.task_completed === 'boolean' &&
       typeof d?.repo_url === 'string' &&
       typeof d?.point === 'number' &&

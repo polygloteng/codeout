@@ -1,12 +1,13 @@
 import { onBeforeMount, ref } from '@nuxtjs/composition-api'
-import { Firestore, doc, getDoc } from 'firebase/firestore'
+import { Firestore, doc, collection, getDoc, getDocs, query, orderBy } from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
-import { User, PublicProfile } from '~/types/db'
-import { userConverter, publicProfileConverter } from '~/lib/converters'
+import { User, PublicProfile, Purchase } from '~/types/db'
+import { userConverter, publicProfileConverter, purchaseConverter } from '~/lib/converters'
 
 export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | null) => {
   const user = ref<User>()
   const publicProfile = ref<PublicProfile>()
+  const purchases = ref<Purchase[]>([])
   onBeforeMount(async () => {
     if (currentUser) {
       const userSnapshot = await getDoc(doc($db, 'users', currentUser.systemUserId).withConverter(userConverter))
@@ -27,5 +28,16 @@ export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | nul
       publicProfile.value = publicProfileSnapshot.data()
     }
   })
-  return { user, publicProfile }
+  onBeforeMount(async () => {
+    if (currentUser) {
+      const querySnapshot = await getDocs(
+        query(
+          collection($db, `users/${currentUser.systemUserId}/purchases`).withConverter(purchaseConverter),
+          orderBy('created', 'desc')
+        )
+      )
+      purchases.value = querySnapshot.docs.map((doc) => doc.data())
+    }
+  })
+  return { user, publicProfile, purchases }
 }

@@ -35,7 +35,11 @@ export interface Task {
 
 export interface Purchase {
   id?: string
-  task_ref: DocumentReference<Task>
+  task: {
+    ref: DocumentReference<Task>
+    name: string
+    thumbnail_url: string
+  }
   task_completed: boolean
   repo_url: string
   point: number
