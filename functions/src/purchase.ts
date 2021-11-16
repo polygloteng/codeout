@@ -114,7 +114,11 @@ export const purchase = functions.region('asia-northeast1').https.onCall(async (
       const now = admin.firestore.Timestamp.now() // transactionを使う場合はserverTimestampは使用不可のようである
       transaction.update(userRef, { point: user.point - task.point, updated: now })
       transaction.set(purchaseRef, {
-        task_ref: taskRef,
+        task: {
+          ref: taskRef,
+          name: task.name,
+          thumbnail_url: task.thumbnail_url,
+        },
         task_completed: false,
         repo_url: `https://github.com/${owner}/${dstRepoName}`,
         point: task.point,

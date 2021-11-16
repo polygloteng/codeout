@@ -36,7 +36,7 @@
             <div v-if="purchase">
               <div class="text-h5 text-left font-weight-bold mt-10">リポジトリ</div>
               <div class="text-body1 text-left">
-                <a :href="purchase.repo_url">{{ purchase.repo_url }}</a>
+                <a :href="purchase.repo_url" target="_blank">{{ purchase.repo_url }}</a>
               </div>
             </div>
           </client-only>

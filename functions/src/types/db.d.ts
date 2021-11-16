@@ -37,7 +37,11 @@ export interface Task {
 // DocumentReferenceを含む型はクライアント用とサーバー用で別々に定義する必要がある
 export interface Purchase {
   id?: string
-  task_ref: DocumentReference<Task>
+  task: {
+    ref: DocumentReference<Task>
+    name: string
+    thumbnail_url: string
+  }
   task_completed: boolean
   repo_url: string
   point: number
