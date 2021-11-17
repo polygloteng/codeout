@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext, ref, watch } from '@nuxtjs/composition-api'
+import { defineComponent, useContext } from '@nuxtjs/composition-api'
 import { useAuth } from '~/composables/auth'
 import { useUser } from '~/composables/user'
 import RequireAuth from '~/middleware/requireAuth'

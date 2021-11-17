@@ -12,13 +12,13 @@ import RequireAuth from '~/middleware/requireAuth'
 export default defineComponent({
   middleware: RequireAuth,
   setup() {
-    const { redirect } = useContext() // this must be called within setup function
+    const context = useContext() // this must be called within setup function
     const router = useRouter() // this must be called within setup function
     const { signIn, onUserSignedInStateSettled } = useAuth()
-    onUserSignedInStateSettled({ signedInCallback: () => redirect('/') })
+    onUserSignedInStateSettled({ signedInCallback: () => context.redirect('/') })
     const signInEx = async () => {
       try {
-        await signIn()
+        await signIn(context)
         router.push('/')
       } catch (error) {
         console.error('sign in failed,', error)

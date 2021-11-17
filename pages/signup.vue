@@ -18,7 +18,7 @@ export default defineComponent({
     onUserSignedInStateSettled({ signedInCallback: () => context.redirect('/') })
     const signUp = async () => {
       try {
-        const userInfo = await signIn()
+        const userInfo = await signIn(context)
         await createUserIfNotExist(context, userInfo)
         router.push('/')
       } catch (error) {
