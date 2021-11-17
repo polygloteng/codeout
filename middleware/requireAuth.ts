@@ -1,10 +1,10 @@
 import { Middleware } from '@nuxt/types'
 
 const middlware: Middleware = ({ $currentUser, route, redirect }) => {
-  if (!$currentUser && route.name !== 'signup' && route.name !== 'signin' && route.name !== 'mypage') {
+  if (!$currentUser.value && route.name !== 'signup' && route.name !== 'signin') {
     redirect('/signin')
   }
-  if ($currentUser && (route.name === 'signup' || route.name === 'signin')) {
+  if ($currentUser.value && (route.name === 'signup' || route.name === 'signin')) {
     redirect('/')
   }
 }

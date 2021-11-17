@@ -9,10 +9,15 @@ import {
 } from 'firebase/auth'
 import { Firestore, doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
+import { PublicProfile } from '~/types/db'
 import { userConverter, publicProfileConverter } from '~/lib/converters'
 import { CurrentUser } from '~/lib/constants'
 
-const retrieveUserInfo = (firebaseUser: FirebaseUser, additionalUserInfo: AdditionalUserInfo | null): UserInfo => {
+const retrieveUserInfo = (
+  firebaseUser: FirebaseUser,
+  additionalUserInfo: AdditionalUserInfo | null,
+  publicProfile: PublicProfile | undefined
+): UserInfo => {
   // メールアドレスが登録されていないケースは発生しないと思われるが一応チェックしておく
   if (!firebaseUser.email) throw new Error('failed to get email')
   const githubUserProfile = firebaseUser.providerData.find(
@@ -25,13 +30,16 @@ const retrieveUserInfo = (firebaseUser: FirebaseUser, additionalUserInfo: Additi
     additionalUserInfo.providerId !== GithubAuthProvider.PROVIDER_ID ||
     !additionalUserInfo.username
   ) {
-    throw new Error('failed to retrieve requreid GitHub additional user information')
+    throw new Error('failed to retrieve required GitHub additional user information')
   }
+  const nickname = publicProfile?.nickname ?? ''
+  const thumbnailURL = publicProfile?.thumbnail_url ?? firebaseUser.photoURL ?? ''
   return {
     systemUserId: firebaseUser.uid,
     githubUserId: githubUserProfile.uid,
     githubUserName: additionalUserInfo.username,
-    thumbnailURL: firebaseUser.photoURL,
+    nickname: nickname,
+    thumbnailURL: thumbnailURL,
   }
 }
 
@@ -42,13 +50,18 @@ export const useAuth = () => {
   }
   const auth = getAuth()
   const provider = new GithubAuthProvider()
-  const signIn = () => {
+  const signIn = ({ $db }: { $db: Firestore }) => {
     return new Promise<UserInfo>(async (resolve, reject) => {
       try {
         const result = await signInWithPopup(auth, provider)
         const firebaseUser = result.user
         const additionalUserInfo = getAdditionalUserInfo(result)
-        const userInfo = retrieveUserInfo(firebaseUser, additionalUserInfo)
+        // Firestoreにアクセスしているが、
+        // useAuthが実行されてもsignIn関数が実行されない限りはここのコードは実行されないので問題ない。
+        const publicProfileSnapshot = await getDoc(
+          doc($db, 'public-profiles', firebaseUser.uid).withConverter(publicProfileConverter)
+        )
+        const userInfo = retrieveUserInfo(firebaseUser, additionalUserInfo, publicProfileSnapshot.data())
         resolve(userInfo)
       } catch (error) {
         reject(error)
@@ -104,7 +117,7 @@ export const createUserIfNotExist = async ({ $db }: { $db: Firestore }, userInfo
         })
         batch.set(publicProfileRef, {
           nickname: userInfo.githubUserName,
-          thumbnail_url: userInfo.thumbnailURL ?? '',
+          thumbnail_url: userInfo.thumbnailURL,
           score: 0,
           created: now,
           updated: now,

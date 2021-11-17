@@ -1,5 +1,5 @@
 import { FirestoreDataConverter, Timestamp, DocumentReference } from 'firebase/firestore'
-import { User, PublicProfile, Task, Purchase } from '~/types/db'
+import { User, PublicProfile, Task, Purchase, Review } from '~/types/db'
 
 export function assertUser(data: any): asserts data is User {
   const d = data as Partial<User>
@@ -105,4 +105,31 @@ export const purchaseConverter: FirestoreDataConverter<Purchase> = {
     return data
   },
   toFirestore: (model: Purchase) => model,
+}
+
+export function assertReview(data: any): asserts data is Review {
+  const d = data as Partial<Review>
+  if (
+    !(
+      typeof d?.profile === 'object' &&
+      d?.profile.ref instanceof DocumentReference &&
+      typeof d?.profile.nickname === 'string' &&
+      typeof d?.profile.thumbnail_url === 'string' &&
+      typeof d?.comment === 'string' &&
+      typeof d?.rating === 'number' &&
+      d?.created instanceof Timestamp &&
+      d?.updated instanceof Timestamp
+    )
+  ) {
+    throw new Error('data is not Review type')
+  }
+}
+
+export const reviewConverter: FirestoreDataConverter<Review> = {
+  fromFirestore(snapshot) {
+    const data = { id: snapshot.id, ...snapshot.data() }
+    assertReview(data)
+    return data
+  },
+  toFirestore: (model: Review) => model,
 }

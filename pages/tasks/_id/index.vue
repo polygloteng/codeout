@@ -50,6 +50,7 @@
           <div v-else>
             <v-btn @click="doPurchase">購入</v-btn>
           </div>
+          <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
         </div>
       </client-only>
     </v-container>
