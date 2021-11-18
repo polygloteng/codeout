@@ -1,7 +1,7 @@
 import { ref, useAsync } from '@nuxtjs/composition-api'
 import { Firestore, getDocs, collection, query, orderBy, limit, getDoc, doc } from 'firebase/firestore'
-import { Task, Purchase } from '~/types/db'
-import { taskConverter } from '~/lib/converters'
+import { Task, Review } from '~/types/db'
+import { taskConverter, reviewConverter } from '~/lib/converters'
 
 export const useTasks = ({ $db }: { $db: Firestore }, maxTasks: number) => {
   const tasks = ref<Task[]>([])
@@ -24,5 +24,12 @@ export const useTask = ({ $db }: { $db: Firestore }, task_id: string) => {
       console.log('No such document!')
     }
   })
-  return { task }
+  const reviews = ref<Review[]>([])
+  useAsync(async () => {
+    const querySnapshot = await getDocs(
+      query(collection($db, `tasks/${task_id}/reviews`).withConverter(reviewConverter), orderBy('created', 'desc'))
+    )
+    reviews.value = querySnapshot.docs.map((doc) => doc.data())
+  })
+  return { task, reviews }
 }
