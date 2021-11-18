@@ -1,4 +1,4 @@
-import { ref, reactive, onBeforeMount } from '@nuxtjs/composition-api'
+import { reactive, onBeforeMount } from '@nuxtjs/composition-api'
 import { Firestore, doc, getDoc, DocumentReference, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
 import { Review } from '~/types/db'
@@ -14,7 +14,6 @@ const makeReviewRef = ($db: Firestore, task_id: string, user_id: string): Docume
 }
 
 export const useReview = ({ $db }: { $db: Firestore }, task_id: string, currentUser: UserInfo | null) => {
-  const review = ref<Review>()
   const data = reactive<Data>({
     rating: 0,
     comment: '',
@@ -24,9 +23,9 @@ export const useReview = ({ $db }: { $db: Firestore }, task_id: string, currentU
       const reviewRef = makeReviewRef($db, task_id, currentUser.systemUserId)
       const reviewSnapshot = await getDoc(reviewRef)
       if (reviewSnapshot.exists()) {
-        review.value = reviewSnapshot.data()
-        data.rating = review.value.rating
-        data.comment = review.value.comment
+        const review = reviewSnapshot.data()
+        data.rating = review.rating
+        data.comment = review.comment
       }
     }
   })
@@ -36,9 +35,10 @@ export const useReview = ({ $db }: { $db: Firestore }, task_id: string, currentU
     if (comment.length <= 0) throw new Error('comment is required')
 
     const reviewRef = makeReviewRef($db, task_id, currentUser.systemUserId)
+    const reviewSnapshot = await getDoc(reviewRef)
     const now = serverTimestamp()
     try {
-      if (review.value) {
+      if (reviewSnapshot.exists()) {
         await updateDoc(reviewRef, {
           comment: comment,
           rating: rating,

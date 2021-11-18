@@ -11,7 +11,7 @@ const props = Object.keys(new PickedTask())
 
 export const onUpdateTask = functions
   .region('asia-northeast1')
-  .firestore.document('tasks/{task}')
+  .firestore.document('tasks/{taskId}')
   .onUpdate(async (change) => {
     try {
       const taskBefore = pick(change.before.data(), props) as PickedTask
