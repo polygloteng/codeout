@@ -53,6 +53,28 @@
           <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
         </div>
       </client-only>
+      <div class="text-h5 text-left font-weight-bold mt-10">レビュー一覧</div>
+      <v-row justify="center">
+        <v-col cols="12" xl="8">
+          <v-row>
+            <v-col v-for="review in reviews" :key="review.id" cols="12" sm="6" md="4">
+              <v-card class="pa-2" outlined tile hover :to="'/profiles/' + review.profile.ref.id">
+                <v-card-title>{{ review.profile.nickname }}</v-card-title>
+                <v-img width="100" :src="review.profile.thumbnail_url"></v-img>
+                <v-card-text>
+                  <v-row align="center" class="mx-0">
+                    <v-rating :value="review.rating" color="amber" dense half-increments readonly size="14"></v-rating>
+                    <div class="grey--text ms-4">{{ review.rating }}</div>
+                  </v-row>
+                  <v-row align="center" class="mx-0"
+                    ><div class="grey--text ms-4">{{ review.comment }}</div>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -67,10 +89,10 @@ export default defineComponent({
   setup() {
     const context = useContext()
     const task_id = context.params.value.id
-    const { task } = useTask(context, task_id)
+    const { task, reviews } = useTask(context, task_id)
     const { currentUser } = useAuth()
     const { purchase, isPurchasing, doPurchase } = usePurchase(context, currentUser.value, task_id)
-    return { task, purchase, currentUser, isPurchasing, doPurchase }
+    return { task, reviews, purchase, currentUser, isPurchasing, doPurchase }
   },
 })
 </script>
