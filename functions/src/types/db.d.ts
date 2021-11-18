@@ -48,3 +48,16 @@ export interface Purchase {
   created: Timestamp
   updated: Timestamp
 }
+
+export interface Review {
+  id?: string
+  profile: {
+    ref: DocumentReference<PublicProfile>
+    nickname: string
+    thumbnail_url: string
+  }
+  comment: string
+  rating: number
+  created: Timestamp
+  updated: Timestamp
+}

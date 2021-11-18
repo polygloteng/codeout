@@ -34,7 +34,7 @@ export const onUpdateTask = functions
         })
       }
       await batch.commit()
-      functions.logger.info('onUpdateTask completed')
+      functions.logger.info('completed')
     } catch (error) {
       functions.logger.error(JSON.stringify(error))
       throw error
