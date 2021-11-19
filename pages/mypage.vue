@@ -1,9 +1,9 @@
 <template>
-  <v-container v-if="user && publicProfile">
-    <v-img :src="publicProfile.thumbnail_url" max-width="90"></v-img>
-    <div>ニックネーム：{{ publicProfile.nickname }}</div>
+  <v-container v-if="user && profile">
+    <v-img :src="profile.thumbnail_url" max-width="90"></v-img>
+    <div>ニックネーム：{{ profile.nickname }}</div>
     <div>残ポイント：{{ user.point }}</div>
-    <div>スコア：{{ publicProfile.score }}</div>
+    <div>スコア：{{ profile.score }}</div>
     <div class="text-h5 font-weight-bold mt-10">購入済みタスク</div>
     <v-row justify="center">
       <v-col cols="12" xl="8">
@@ -37,8 +37,8 @@ export default defineComponent({
     const context = useContext()
     const { currentUser, onUserSignedInStateSettled } = useAuth()
     onUserSignedInStateSettled({ notSignedInCallback: () => context.redirect('/') })
-    const { user, publicProfile, purchases } = useUser(context, currentUser.value)
-    return { user, publicProfile, purchases }
+    const { user, profile, purchases } = useUser(context, currentUser.value)
+    return { user, profile, purchases }
   },
 })
 </script>

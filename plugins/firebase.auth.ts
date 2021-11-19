@@ -3,7 +3,7 @@ import { Plugin } from '@nuxt/types'
 import { doc, getDoc } from 'firebase/firestore'
 import { getAuth, Unsubscribe } from 'firebase/auth'
 import { UserInfo } from '~/types/auth'
-import { userConverter, publicProfileConverter } from '~/lib/converters'
+import { userConverter, profileConverter } from '~/lib/converters'
 import { CurrentUser } from '~/lib/constants'
 
 const plugin: Plugin = async (context) => {
@@ -19,15 +19,15 @@ const plugin: Plugin = async (context) => {
         console.log('in plugin, auth state changed, user signed in')
         const userSnapshot = await getDoc(doc(context.$db, 'users', user.uid).withConverter(userConverter))
         if (!userSnapshot.exists) throw new Error('cannot find user document')
-        const publicProfileSnapshot = await getDoc(
-          doc(context.$db, 'public-profiles', user.uid).withConverter(publicProfileConverter)
+        const profileSnapshot = await getDoc(
+          doc(context.$db, 'public-profiles', user.uid).withConverter(profileConverter)
         )
-        if (!publicProfileSnapshot.exists) throw new Error('cannot find public profile document')
+        if (!profileSnapshot.exists) throw new Error('cannot find public profile document')
         currentUser.value = {
           systemUserId: user.uid,
           githubUserId: userSnapshot.data()!.github_uid,
           githubUserName: userSnapshot.data()!.github_username,
-          nickname: publicProfileSnapshot.data()!.nickname,
+          nickname: profileSnapshot.data()!.nickname,
           thumbnailURL: user.photoURL ?? '',
         }
       }

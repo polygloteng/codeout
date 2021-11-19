@@ -48,7 +48,7 @@ service cloud.firestore {
     function userPath(uid) {
       return /databases/$(database)/documents/users/$(uid)
     }
-    function publicProfilePath(uid) {
+    function profilePath(uid) {
       return /databases/$(database)/documents/public-profiles/$(uid)
     }
     match /users/{uid} {
@@ -58,8 +58,8 @@ service cloud.firestore {
         && isValidUser(request.resource.data)
         && request.resource.data.created == request.time
         && request.resource.data.updated == request.time
-        && !exists(publicProfilePath(request.auth.uid))
-        && existsAfter(publicProfilePath(request.auth.uid))
+        && !exists(profilePath(request.auth.uid))
+        && existsAfter(profilePath(request.auth.uid))
     }
     match /users/{uid}/purchases/{task} {
       allow read: if request.auth != null && request.auth.uid == uid

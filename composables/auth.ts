@@ -10,13 +10,13 @@ import {
 import { Firestore, doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
 import { PublicProfile } from '~/types/db'
-import { userConverter, publicProfileConverter } from '~/lib/converters'
+import { userConverter, profileConverter } from '~/lib/converters'
 import { CurrentUser } from '~/lib/constants'
 
 const retrieveUserInfo = (
   firebaseUser: FirebaseUser,
   additionalUserInfo: AdditionalUserInfo | null,
-  publicProfile: PublicProfile | undefined
+  profile: PublicProfile | undefined
 ): UserInfo => {
   // メールアドレスが登録されていないケースは発生しないと思われるが一応チェックしておく
   if (!firebaseUser.email) throw new Error('failed to get email')
@@ -32,8 +32,8 @@ const retrieveUserInfo = (
   ) {
     throw new Error('failed to retrieve required GitHub additional user information')
   }
-  const nickname = publicProfile?.nickname ?? ''
-  const thumbnailURL = publicProfile?.thumbnail_url ?? firebaseUser.photoURL ?? ''
+  const nickname = profile?.nickname ?? ''
+  const thumbnailURL = profile?.thumbnail_url ?? firebaseUser.photoURL ?? ''
   return {
     systemUserId: firebaseUser.uid,
     githubUserId: githubUserProfile.uid,
@@ -58,10 +58,10 @@ export const useAuth = () => {
         const additionalUserInfo = getAdditionalUserInfo(result)
         // Firestoreにアクセスしているが、
         // useAuthが実行されてもsignIn関数が実行されない限りはここのコードは実行されないので問題ない。
-        const publicProfileSnapshot = await getDoc(
-          doc($db, 'public-profiles', firebaseUser.uid).withConverter(publicProfileConverter)
+        const profileSnapshot = await getDoc(
+          doc($db, 'public-profiles', firebaseUser.uid).withConverter(profileConverter)
         )
-        const userInfo = retrieveUserInfo(firebaseUser, additionalUserInfo, publicProfileSnapshot.data())
+        const userInfo = retrieveUserInfo(firebaseUser, additionalUserInfo, profileSnapshot.data())
         resolve(userInfo)
       } catch (error) {
         reject(error)
@@ -103,9 +103,7 @@ export const createUserIfNotExist = async ({ $db }: { $db: Firestore }, userInfo
       const userSnapshot = await getDoc(doc($db, 'users', userInfo.systemUserId))
       if (!userSnapshot.exists()) {
         const userRef = doc($db, 'users', userInfo.systemUserId).withConverter(userConverter)
-        const publicProfileRef = doc($db, 'public-profiles', userInfo.systemUserId).withConverter(
-          publicProfileConverter
-        )
+        const profileRef = doc($db, 'public-profiles', userInfo.systemUserId).withConverter(profileConverter)
         const now = serverTimestamp()
         const batch = writeBatch($db)
         batch.set(userRef, {
@@ -115,7 +113,7 @@ export const createUserIfNotExist = async ({ $db }: { $db: Firestore }, userInfo
           created: now,
           updated: now,
         })
-        batch.set(publicProfileRef, {
+        batch.set(profileRef, {
           nickname: userInfo.githubUserName,
           thumbnail_url: userInfo.thumbnailURL,
           score: 0,

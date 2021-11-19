@@ -1,12 +1,12 @@
-import { onBeforeMount, ref } from '@nuxtjs/composition-api'
+import { onBeforeMount, useAsync, ref } from '@nuxtjs/composition-api'
 import { Firestore, doc, collection, getDoc, getDocs, query, orderBy } from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
 import { User, PublicProfile, Purchase } from '~/types/db'
-import { userConverter, publicProfileConverter, purchaseConverter } from '~/lib/converters'
+import { userConverter, profileConverter, purchaseConverter } from '~/lib/converters'
 
 export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | null) => {
   const user = ref<User>()
-  const publicProfile = ref<PublicProfile>()
+  const profile = ref<PublicProfile>()
   const purchases = ref<Purchase[]>([])
   onBeforeMount(async () => {
     if (currentUser) {
@@ -19,13 +19,13 @@ export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | nul
   })
   onBeforeMount(async () => {
     if (currentUser) {
-      const publicProfileSnapshot = await getDoc(
-        doc($db, 'public-profiles', currentUser.systemUserId).withConverter(publicProfileConverter)
+      const profileSnapshot = await getDoc(
+        doc($db, 'public-profiles', currentUser.systemUserId).withConverter(profileConverter)
       )
-      if (!publicProfileSnapshot.exists()) {
+      if (!profileSnapshot.exists()) {
         throw new Error('public profile does not exist')
       }
-      publicProfile.value = publicProfileSnapshot.data()
+      profile.value = profileSnapshot.data()
     }
   })
   onBeforeMount(async () => {
@@ -39,5 +39,17 @@ export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | nul
       purchases.value = querySnapshot.docs.map((doc) => doc.data())
     }
   })
-  return { user, publicProfile, purchases }
+  return { user, profile, purchases }
+}
+
+export const useProfile = ({ $db }: { $db: Firestore }, uid: string) => {
+  const profile = ref<PublicProfile>()
+  useAsync(async () => {
+    const profileSnapshot = await getDoc(doc($db, 'public-profiles', uid).withConverter(profileConverter))
+    if (!profileSnapshot.exists()) {
+      throw new Error('public profile does not exist')
+    }
+    profile.value = profileSnapshot.data()
+  })
+  return { profile }
 }
