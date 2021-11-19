@@ -45,10 +45,10 @@ export const useReview = ({ $db }: { $db: Firestore }, task_id: string, currentU
           updated: now,
         })
       } else {
-        const publicProfileRef = doc($db, 'public-profiles', currentUser.systemUserId)
+        const profileRef = doc($db, 'public-profiles', currentUser.systemUserId)
         await setDoc(reviewRef, {
           profile: {
-            ref: publicProfileRef,
+            ref: profileRef,
             nickname: currentUser.nickname,
             thumbnail_url: currentUser.thumbnailURL,
           },

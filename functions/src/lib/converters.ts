@@ -40,7 +40,7 @@ export function assertPublicProfile(data: any): asserts data is PublicProfile {
   }
 }
 
-export const publicProfileConverter: FirestoreDataConverter<PublicProfile> = {
+export const profileConverter: FirestoreDataConverter<PublicProfile> = {
   fromFirestore(snapshot) {
     const data = { id: snapshot.id, ...snapshot.data() }
     assertPublicProfile(data)

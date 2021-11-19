@@ -14,9 +14,9 @@ export const onUpdatePublicProfile = functions
   .firestore.document('public-profiles/{uid}')
   .onUpdate(async (change) => {
     try {
-      const publicProfileBefore = pick(change.before.data(), props) as PickedPublicProfile
-      const publicProfileAfter = pick(change.after.data(), props) as PickedPublicProfile
-      if (equal(publicProfileBefore, publicProfileAfter)) {
+      const profileBefore = pick(change.before.data(), props) as PickedPublicProfile
+      const profileAfter = pick(change.after.data(), props) as PickedPublicProfile
+      if (equal(profileBefore, profileAfter)) {
         functions.logger.info('target fields are same. so do nothing')
         return
       }
@@ -28,8 +28,8 @@ export const onUpdatePublicProfile = functions
       const batch = admin.firestore().batch()
       for (const review of reviewSnapshot.docs) {
         batch.update(review.ref, {
-          'profile.nickname': publicProfileAfter.nickname,
-          'profile.thumbnail_url': publicProfileAfter.thumbnail_url,
+          'profile.nickname': profileAfter.nickname,
+          'profile.thumbnail_url': profileAfter.thumbnail_url,
           updated: admin.firestore.FieldValue.serverTimestamp(),
         })
       }

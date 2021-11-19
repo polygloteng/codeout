@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as crypto from 'crypto'
-import { userConverter, publicProfileConverter, taskConverter, purchaseConverter } from './lib/converters'
+import { userConverter, profileConverter, taskConverter, purchaseConverter } from './lib/converters'
 
 const ERROR_MSG_INVALID_HTTP_METHOD = 'invalid HTTP method'
 const ERROR_MSG_INVALID_BASE_BRANCH = 'invalid base branch'
@@ -10,7 +10,7 @@ const ERROR_MSG_INVALID_SIGNATURE = 'invalid signature'
 const ERROR_MSG_TASK_DOES_NOT_EXIST = 'task does not exist, probably not a learning repository'
 const ERROR_MSG_USER_DOES_NOT_EXIST = 'user does not exist'
 const ERROR_MSG_PURCHASE_DOES_NOT_EXIST = 'purchase does not exist'
-const ERROR_MSG_PUBLIC_PROFILE_DOES_NOT_EXIST = 'publicProfile does not exist'
+const ERROR_MSG_PUBLIC_PROFILE_DOES_NOT_EXIST = 'public-profile does not exist'
 const ERROR_MSG_TASK_ALREADY_COMPLETED = 'task has already been completed'
 const ERROR_MSG_UNEXPECTED = 'unexpected error occurred'
 const MSG_COMPLETED = 'completed'
@@ -96,15 +96,15 @@ export const mergeHook = functions.region('asia-northeast1').https.onRequest(asy
         return
       }
 
-      const publicProfileRef = admin.firestore().doc(`public-profiles/${user.id}`).withConverter(publicProfileConverter)
-      const publicProfileSnapshot = await transaction.get(publicProfileRef)
-      const publicProfile = publicProfileSnapshot.data()
-      functions.logger.info('publicProfile is:', publicProfile)
-      if (!publicProfile) throw new Error(ERROR_MSG_PUBLIC_PROFILE_DOES_NOT_EXIST)
+      const profileRef = admin.firestore().doc(`public-profiles/${user.id}`).withConverter(profileConverter)
+      const profileSnapshot = await transaction.get(profileRef)
+      const profile = profileSnapshot.data()
+      functions.logger.info('public-profile is:', profile)
+      if (!profile) throw new Error(ERROR_MSG_PUBLIC_PROFILE_DOES_NOT_EXIST)
 
       const now = admin.firestore.Timestamp.now() // transactionを使う場合はserverTimestampは使用不可のようである
       transaction.update(purchaseRef, { task_completed: true, updated: now })
-      transaction.update(publicProfileRef, { score: publicProfile.score + task.score, updated: now })
+      transaction.update(profileRef, { score: profile.score + task.score, updated: now })
 
       functions.logger.info(MSG_COMPLETED)
       res.send(MSG_COMPLETED)
