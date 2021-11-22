@@ -50,4 +50,7 @@ function setup_constants() {
 
   readonly GitHubWebhookSecret="GitHubWebhookSecret_${env}"
   readonly GitHubToken="GitHubToken_${env}"
+
+  readonly AlgoliaAppId="AlgoliaAppId_${env}"
+  readonly AlgoliaApiKey="AlgoliaApiKey_${env}"
 }

@@ -24,6 +24,7 @@ export default {
   plugins: [
     '~/plugins/firebase.ts',
     '~/plugins/firebase.auth.ts',
+    '~/plugins/algolia.ts',
     { src: '~/plugins/persistedstate.ts', ssr: false }
   ],
 
@@ -89,6 +90,11 @@ export default {
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       appId: process.env.FIREBASE_APP_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+    },
+    algoliaConfig: {
+      appId: process.env.ALGOLIA_APP_ID,
+      apiKey: process.env.ALGOLIA_API_KEY,
+      taskIndexName: process.env.ALGOLIA_TASK_INDEX_NAME,
     },
     assetsDomain: process.env.ASSETS_DOMAIN,
   },

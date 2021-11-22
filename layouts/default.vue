@@ -15,6 +15,8 @@
         rounded
         append-icon="mdi-magnify"
         class="d-none d-md-block shrink"
+        v-model="data.keywords"
+        @keydown.enter="doSearch"
       ></v-text-field>
       <client-only>
         <v-toolbar-items v-if="currentUser" class="d-none d-md-block">
@@ -88,6 +90,7 @@ interface NavList {
 interface Data {
   clipped: boolean
   drawer: boolean
+  keywords: string
 }
 
 export default defineComponent({
@@ -107,6 +110,7 @@ export default defineComponent({
     const data = reactive<Data>({
       clipped: false,
       drawer: false,
+      keywords: '',
     })
     const router = useRouter()
     const { currentUser, signOut } = useAuth()
@@ -114,7 +118,10 @@ export default defineComponent({
       signOut()
       router.push('/')
     }
-    return { data, currentUser, signOutEx }
+    const doSearch = () => {
+      router.push({ path: 'search', query: { keywords: data.keywords } })
+    }
+    return { data, currentUser, signOutEx, doSearch }
   },
 })
 </script>

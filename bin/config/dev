@@ -10,3 +10,6 @@ readonly AssetsDomain=https://codeout-dev.web.app
 
 # GitHub
 readonly GitHubOrganization=zskclassroom01
+
+# Algolia
+readonly AlgoliaTaskIndexName=codeout-dev-tasks
