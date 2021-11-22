@@ -24,7 +24,10 @@ function deploy() {
   app_id=$(eval echo '$'${FirebaseAppId})
   local measurement_id
   measurement_id=$(eval echo '$'${FirebaseMeasurementId})
-
+  local algolia_app_id
+  algolia_app_id=$(eval echo '$'${AlgoliaAppId})
+  local algolia_api_key
+  algolia_api_key=$(eval echo '$'${AlgoliaApiKey})
   gcloud run deploy ${CloudRunServiceName} \
     --project ${Project} \
     --region ${Region} \
@@ -36,6 +39,9 @@ function deploy() {
     --set-env-vars FIREBASE_APP_ID=${app_id} \
     --set-env-vars FIREBASE_MEASUREMENT_ID=${measurement_id} \
     --set-env-vars ASSETS_DOMAIN=${AssetsDomain} \
+    --set-env-vars ALGOLIA_APP_ID=${algolia_app_id} \
+    --set-env-vars ALGOLIA_API_KEY=${algolia_api_key} \
+    --set-env-vars ALGOLIA_TASK_INDEX_NAME=${AlgoliaTaskIndexName} \
     --set-env-vars TZ=Asia/Tokyo \
     --platform managed \
     --no-allow-unauthenticated \
