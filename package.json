@@ -40,6 +40,6 @@
     "prettier": "^2.4.1",
     "ts-jest": "^27.0.3",
     "vue-jest": "^3.0.4",
-    "vuex-module-decorators": "^1.0.1"
+    "vuex-module-decorators": "^2.0.0"
   }
 }
