@@ -2,7 +2,7 @@
   <div>
 
     <v-container fluid>
-      <v-row align="center" class="codeout-topmv-area py-sm-10 px-sm-16 pt-10 pb-10 px-3 flex-row-reverse">
+      <v-row class="align-center codeout-topmv-area py-sm-10 px-sm-16 pt-10 pb-10 px-3 flex-row-reverse">
         <v-col cols="12" md="8" sm="12" xs="12">
           <v-img :src="`${$config.assetsDomain}/images/top_mv.svg`"></v-img>
         </v-col>
@@ -14,21 +14,23 @@
       </v-row>
     </v-container>
 
-    <v-container fluid class="codeout-topgrid-area codeout-bg-grad py-sm-10 px-sm-16 pt-10 pb-10 px-3 pa-6 primary white--text">
-      <v-row justify="center" class="my-10">
+    <v-container fluid class="codeout-topgrid-area codeout-bg-grad py-sm-16 px-sm-16 pt-10 pb-10 px-3 primary white--text">
+      <v-row class="justify-center mt-3 mb-6">
         <h2>レッスン一覧</h2>
       </v-row>
-      <v-row justify="flex-start">
-        <v-col v-for="task, index) in tasks" :key="task.name" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
-          <v-card class="ma-3 rounded-lg" tile hover :to="'/tasks/' + task.id">
-            <!--サムネ画像の表示確認用に、ファイル名末尾の連番をループカウントで暫定的に付与しています。DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/29佐藤）-->
-            <v-img height="250" :src="`${$config.assetsDomain}/images/top_study_thumb0${index+1}.png`"></v-img>
+      <v-row>
+        <!--サムネ画像の表示確認用に、ファイル名末尾の連番をループカウントで暫定的に付与しています。（12/29佐藤）-->
+        <v-col class="codeout-card-align-stretch pa-6" v-for="(task, index) in tasks" :key="task.name" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
+          <v-card class="rounded-lg" hover :to="'/tasks/' + task.id">
+            <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/29佐藤）-->
+            <v-img height="240" :src="`${$config.assetsDomain}/images/top_study_thumb0${index+1}.png`"></v-img>
             <v-card-title>{{ task.name }}</v-card-title>
             <v-card-text>
-              <v-row align="center" class="mx-0">
+              <v-row class="mx-0">
                 <v-rating
                   :value="task.avg_rating"
-                  color="amber"
+                  color="#275DC2"
+                  background-color="grey lighten-2"
                   dense
                   half-increments
                   readonly

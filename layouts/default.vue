@@ -234,4 +234,8 @@ export default defineComponent({
   background: -webkit-linear-gradient(to bottom #1E47B5, #50C5FF);
   background: linear-gradient(to bottom, #275DC2, #44A8EE);
 }
+
+.codeout-card-align-stretch a {
+  height: 100%;
+}
 </style>
