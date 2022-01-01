@@ -1,81 +1,85 @@
 <template>
   <div>
-    <v-container v-if="task">
-      <v-row justify="center">
-        <v-col cols="12" md="8">
-          <div>
-            <div class="text-h4 text-center font-weight-bold">
-              {{ task.name }}
-            </div>
-            <client-only>
-              <v-img
-                style="border: 2px solid #cccccc"
-                class="mx-auto mt-10"
-                max-width="100%"
-                :src="`${$config.assetsDomain}/images/study.png`"
-              ></v-img>
-            </client-only>
-          </div>
-          <div>
-            <span>評価：</span>
-            <v-rating
-              :value="task.avg_rating"
-              color="amber"
-              dense
-              half-increments
-              readonly
-              size="14"
-              class="d-inline-block"
-            ></v-rating>
-          </div>
 
-          <div class="text-h5 text-left font-weight-bold mt-10">タスクの概要</div>
-          <div class="text-body1 text-left">{{ task.description }}</div>
-
+    <v-container fluid v-if="task" class="codeout-task-area py-sm-10 px-sm-16 pt-10 pb-10 px-6">
+      <v-row class="mx-md-16 mx-0">
+        <v-col class="pr-md-6 pr-3" cols="12" md="6" sm="12" xs="12">
           <client-only>
-            <div v-if="purchase">
+            <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/30佐藤）-->
+            <v-img class="mb-6" height="240" :src="`${$config.assetsDomain}/images/top_study_thumb01.png`"></v-img>
+            <v-img class="mb-6" height="240" :src="`${$config.assetsDomain}/images/top_study_thumb02.png`"></v-img>
+          </client-only>
+        </v-col>
+        <v-col class="pl-md-6 pl-3" cols="12" md="6" sm="12" xs="12">
+          <h2 class="mb-6">{{ task.name }}</h2>
+          <p class="mb-0">評価：</p>
+          <v-rating
+            :value="task.avg_rating"
+            color="#275DC2"
+            background-color="grey lighten-2"
+            dense
+            half-increments
+            readonly
+            size="24"
+            class="d-inline-block"
+          ></v-rating>
+          <!--購入処理が動作しませんでした。（12/31佐藤）-->
+          <client-only>
+            <div class="mt-6" v-if="purchase">
               <div class="text-h5 text-left font-weight-bold mt-10">リポジトリ</div>
               <div class="text-body1 text-left">
                 <a :href="purchase.repo_url" target="_blank">{{ purchase.repo_url }}</a>
               </div>
             </div>
           </client-only>
-        </v-col>
-      </v-row>
-      <client-only>
-        <div class="mx-auto mt-10" style="width: 200px">
-          <div v-if="!currentUser"><router-link to="/signup">会員登録して購入</router-link></div>
-          <div v-else-if="purchase">購入済み</div>
-          <div v-else-if="isPurchasing">購入処理実行中</div>
-          <div v-else>
-            <v-btn @click="doPurchase">購入</v-btn>
-          </div>
-          <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
-        </div>
-      </client-only>
-      <div class="text-h5 text-left font-weight-bold mt-10">レビュー一覧</div>
-      <v-row justify="center">
-        <v-col cols="12" xl="8">
-          <v-row>
-            <v-col v-for="review in reviews" :key="review.id" cols="12" sm="6" md="4">
-              <v-card class="pa-2" outlined tile hover :to="'/profiles/' + review.profile.ref.id">
-                <v-card-title>{{ review.profile.nickname }}</v-card-title>
-                <v-img width="100" :src="review.profile.thumbnail_url"></v-img>
-                <v-card-text>
-                  <v-row align="center" class="mx-0">
-                    <v-rating :value="review.rating" color="amber" dense half-increments readonly size="14"></v-rating>
-                    <div class="grey--text ms-4">{{ review.rating }}</div>
-                  </v-row>
-                  <v-row align="center" class="mx-0"
-                    ><div class="grey--text ms-4">{{ review.comment }}</div>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
+          <p class="mt-6 text-body1 text-left">{{ task.description }}</p>
+          <client-only>
+            <!--購入処理が動作しませんでした。（12/31佐藤）-->
+            <div class="">
+              <div v-if="!currentUser"><router-link to="/signup">会員登録して購入</router-link></div>
+              <div v-else-if="purchase">購入済み</div>
+              <div v-else-if="isPurchasing">購入処理実行中</div>
+              <div v-else>
+                <v-btn @click="doPurchase" class="codeout-btn-size-default codeout-btn-a mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg">タスクを購入</v-btn>
+              </div>
+              <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
+            </div>
+          </client-only>
         </v-col>
       </v-row>
     </v-container>
+
+    <v-container fluid class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
+      <v-row class="mt-3 mb-6">
+        <h3 class="px-2">レビュー一覧</h3>
+      </v-row>
+      <v-row>
+        <v-col class="codeout-card-align-stretch" v-for="review in reviews" :key="review.id" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
+          <v-card class="rounded-lg" min-height="170" hover :to="'/profiles/' + review.profile.ref.id">
+            <v-row>
+              <v-col cols="4">
+                <v-row class="justify-center mt-2 pl-8">
+                  <v-img class="rounded-circle" width="100%" max-width="100" :src="review.profile.thumbnail_url"></v-img>
+                </v-row>
+              </v-col>
+              <v-col cols="8">
+                <v-card-title class="pt-0">{{ review.profile.nickname }}</v-card-title>
+                <v-card-text>
+                  <v-row class="mx-0">
+                    <v-rating :value="review.rating" color="#275DC2" background-color="grey lighten-2" dense half-increments readonly size="14"></v-rating>
+                    <p class="grey--text ml-3">{{ review.rating }}</p>
+                  </v-row>
+                  <v-row class="mx-0">
+                    <p class="grey--text">{{ review.comment }}</p>
+                  </v-row>
+                </v-card-text>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
   </div>
 </template>
 

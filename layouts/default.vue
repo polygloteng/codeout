@@ -131,7 +131,7 @@
       </v-row>
       <v-row class="pt-0 pb-0 px-3 px-sm-16 pb-sm-6">
         <v-col class="codeout-footer-copyright">
-          <p class="grey--text">Copyright &copy; 2019 株式会社ポリグロット</p>
+          <p class="grey--text caption">Copyright &copy; 2019 株式会社ポリグロット</p>
         </v-col>
       </v-row>
     </v-footer>
@@ -206,6 +206,12 @@ export default defineComponent({
   padding-left: 10px;
 }
 
+.codeout-btn-size-small {
+  width: 100%;
+  max-width: 175px !important;
+  min-height: 37px;
+  border-radius: 18.5px;
+}
 .codeout-btn-size-default {
   width: 100%;
   max-width: 270px !important;
@@ -226,13 +232,42 @@ export default defineComponent({
   padding-bottom: 2px;
 }
 
+.codeout-btn-a,
 .codeout-btn-grad {
+  color: #FFFFFF !important;
   background: -webkit-linear-gradient(to right, #1E47B5, #50C5FF);
   background: linear-gradient(to right, #1E47B5, #50C5FF);
 }
+
+.codeout-btn-b {
+  color: #CCCCCC !important;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+.codeout-btn-c {
+  color: #275DC2 !important;
+  background-color: #FFFFFF;
+  border: 1px solid #275DC2;
+}
+
 .codeout-bg-grad {
   background: -webkit-linear-gradient(to bottom #1E47B5, #50C5FF);
   background: linear-gradient(to bottom, #275DC2, #44A8EE);
+}
+
+.codeout-mypage-wrapper {
+  width:100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.codeout-mission-bg {
+  width: 100%;
+  max-width: 100px !important;
+  color: #FFFFFF;
+  background-color: #275DC2;
+  text-align: center;
 }
 
 .codeout-card-align-stretch a {
