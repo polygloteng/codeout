@@ -1,13 +1,13 @@
 <template>
   <div>
 
-    <v-container fluid v-if="profile" class="codeout-head-area py-sm-10 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="profile" class="codeout-head-area py-sm-10 px-sm-16 py-10 px-6">
       <h2 class="">プロフィール</h2>
     </v-container>
 
-    <v-container fluid v-if="profile" class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
-      <v-row class="justify-center">
-        <v-card width="100%" max-width="930" class="pa-sm-6 ma-3 pa-md-10 pa-6">
+    <v-container fluid v-if="profile" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
+      <v-row class="justify-center px-sm-6 pa-3">
+        <v-card width="100%" max-width="930" class="rounded-lg pa-sm-6 pa-md-10 pa-6">
           <v-row>
             <v-col cols="12" md="2" sm="12" xs="12">
               <client-only>
@@ -16,15 +16,16 @@
                 </v-row>
               </client-only>
             </v-col>
+
             <v-col cols="12" md="10" sm="12" xs="12">
-              <v-row class="justify-space-between">
-                <v-col>
-                <h3>{{ profile.nickname }}</h3>
-                </v-col>
-                <v-col>
-                  <p class="mt-1 float-right"><span class="mr-2 grey--text caption">スコア</span>{{ profile.score }}</p>
-                </v-col>
-              </v-row>
+              <div class="d-flex justify-space-between">
+                <div class="">
+                  <h3>{{ profile.nickname }}</h3>
+                </div>
+                <div class="">
+                  <p class="mt-1"><span class="mr-2 grey--text caption">スコア</span>{{ profile.score }}</p>
+                </div>
+              </div>
               <v-divider class="mt-3 mb-9"></v-divider>
               <p class="grey--text">紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。</p>
               <h4 class="mt-9 mb-3">購入済みタスク</h4>

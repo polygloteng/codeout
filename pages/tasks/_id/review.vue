@@ -1,11 +1,11 @@
 <template>
   <div>
 
-    <v-container fluid v-if="task && currentUser" class="codeout-head-area py-sm-10 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="task && currentUser" class="codeout-head-area py-sm-10 px-sm-16 py-10 px-6">
       <h2 class="">レビューを書く</h2>
     </v-container>
 
-    <v-container fluid v-if="task && currentUser" class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="task && currentUser" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <v-row class="justify-center">
         <v-card width="100%" max-width="930" class="ma-6 pa-md-10 pa-6">
           <v-row>

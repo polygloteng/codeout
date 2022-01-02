@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <v-container fluid class="codeout-topmv-area py-sm-10 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid class="codeout-topmv-area py-sm-10 px-sm-16 py-10 px-6">
       <v-row class="align-center flex-row-reverse">
         <v-col cols="12" md="8" sm="12" xs="12">
           <v-img :src="`${$config.assetsDomain}/images/top_mv.svg`"></v-img>
@@ -14,13 +14,13 @@
       </v-row>
     </v-container>
 
-    <v-container fluid class="codeout-topgrid-area codeout-bg-grad py-sm-16 px-sm-16 pt-10 pb-10 px-6 primary white--text">
+    <v-container fluid class="codeout-topgrid-area codeout-bg-grad py-sm-16 px-sm-16 py-16 px-6 primary white--text">
       <v-row class="justify-center mt-3 mb-6">
         <h2>レッスン一覧</h2>
       </v-row>
       <v-row>
         <!--サムネ画像の表示確認用に、ファイル名末尾の連番をループカウントで暫定的に付与しています。（12/29佐藤）-->
-        <v-col class="codeout-card-align-stretch pa-6" v-for="(task, index) in tasks" :key="task.name" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
+        <v-col class="codeout-card-align-stretch pa-sm-6 pa-3" v-for="(task, index) in tasks" :key="task.name" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
           <v-card class="rounded-lg" hover :to="'/tasks/' + task.id">
             <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/29佐藤）-->
             <v-img height="240" :src="`${$config.assetsDomain}/images/top_study_thumb0${index+1}.png`"></v-img>

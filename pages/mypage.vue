@@ -1,30 +1,11 @@
 <template>
   <div>
 
-    <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <div class="codeout-mypage-wrapper">
-        <v-row class="justify-center">
-          <v-col cols="12" md="3" sm="12" xs="12">
-            <v-card class="pa-sm-6 pa-md-10 pa-6">
-              <client-only>
-                <v-row class="justify-center mt-2 mb-2">
-                  <v-img class="rounded-circle" width="100%" max-width="100" :src="profile.thumbnail_url"></v-img>
-                </v-row>
-                <h3 class="mt-4 mb-4 text-center">{{ profile.nickname }}</h3>
-                <p class="grey--text caption">紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。</p>
-                <v-divider class="mt-6 mb-6"></v-divider>
-                <span class="grey--text caption">残ポイント</span>
-                <p>{{ user.point }}</p>
-                <span class="grey--text caption">スコア</span>
-                <p>{{ profile.score }}</p>
-                <!--リンク設定していただければと思います。（12/31佐藤）-->
-                <v-btn to="#" class="codeout-btn-size-small codeout-btn-c mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg">会員登録する</v-btn>
-              </client-only>
-            </v-card>
-          </v-col>
-
+        <v-row class="justify-center flex-row-reverse px-sm-3 pa-0">
           <v-col cols="12" md="9" sm="12" xs="12">
-            <v-card class="pa-sm-6 pa-md-10 pa-6">
+            <v-card class="rounded-lg pa-sm-6 pa-md-10 pa-6">
               <h2>マイページ</h2>
               <h3 class="mt-9 mb-3">購入済みタスク</h3>
               <v-divider class="mt-3 mb-9"></v-divider>
@@ -48,17 +29,44 @@
               </div><!--ループ終了-->
             </v-card>
           </v-col>
+
+          <v-col cols="12" md="3" sm="12" xs="12">
+            <v-card class="rounded-lg pa-sm-6 pa-md-6 pa-6">
+              <client-only>
+                <v-row class="justify-center mt-2 mb-2">
+                  <v-img class="rounded-circle" width="100%" max-width="100" :src="profile.thumbnail_url"></v-img>
+                </v-row>
+                <h3 class="mt-4 mb-4 text-center">{{ profile.nickname }}</h3>
+                <p class="grey--text caption">紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。紹介文が入ります。</p>
+                <v-divider class="mt-6 mb-6"></v-divider>
+                <div class="d-flex justify-center flex-md-column">
+                  <div class="pb-0 pr-md-0 pr-5 text-md-left text-center">
+                    <span class="grey--text caption">残ポイント</span>
+                    <p class="mb-0">{{ user.point }}</p>
+                  </div >
+                  <div class="pb-0 pl-md-0 pl-5 text-md-left text-center">
+                    <span class="grey--text caption">スコア</span>
+                    <p class="mb-0">{{ profile.score }}</p>
+                  </div >
+                </div>
+                <!--リンク設定していただければと思います。（12/31佐藤）-->
+                <v-row class="justify-center">
+                  <v-btn to="#" class="codeout-btn-size-small codeout-btn-c mt-6 mb-6 v-btn v-btn--is-elevated v-btn--has-bg caption">プロフィールを編集する</v-btn>
+                </v-row>
+              </client-only>
+            </v-card>
+          </v-col>
         </v-row>
       </div>
     </v-container>
 
 
     <!--動作しなかったため、モックアップで作成しました。（12/31佐藤）-->
-    <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <div class="codeout-mypage-wrapper">
-        <v-row class="justify-center">
+        <v-row class="justify-center flex-row-reverse px-sm-3 pa-0">
           <v-col cols="12" md="12" sm="12" xs="12">
-            <v-card class="pa-sm-6 pa-md-10 pa-6">
+            <v-card class="rounded-lg pa-sm-6 pa-md-10 pa-6">
               <div class="text-h5 font-weight-bold mt-10">購入済みタスク</div>
               <v-row justify="center">
                 <v-col cols="12" xl="8">

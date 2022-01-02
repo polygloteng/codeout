@@ -1,16 +1,16 @@
 <template>
   <div>
 
-    <v-container fluid v-if="task" class="codeout-task-area py-sm-10 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid v-if="task" class="codeout-task-area py-sm-10 px-sm-16 py-10 px-6">
       <v-row class="mx-md-16 mx-0">
-        <v-col class="pr-md-6 pr-3" cols="12" md="6" sm="12" xs="12">
+        <v-col class="pr-md-6 px-0" cols="12" md="6" sm="12" xs="12">
           <client-only>
             <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/30佐藤）-->
             <v-img class="mb-6" height="240" :src="`${$config.assetsDomain}/images/top_study_thumb01.png`"></v-img>
             <v-img class="mb-6" height="240" :src="`${$config.assetsDomain}/images/top_study_thumb02.png`"></v-img>
           </client-only>
         </v-col>
-        <v-col class="pl-md-6 pl-3" cols="12" md="6" sm="12" xs="12">
+        <v-col class="pl-md-6 px-0" cols="12" md="6" sm="12" xs="12">
           <h2 class="mb-6">{{ task.name }}</h2>
           <p class="mb-0">評価：</p>
           <v-rating
@@ -40,16 +40,20 @@
               <div v-else-if="purchase">購入済み</div>
               <div v-else-if="isPurchasing">購入処理実行中</div>
               <div v-else>
-                <v-btn @click="doPurchase" class="codeout-btn-size-default codeout-btn-a mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg">タスクを購入</v-btn>
+                <div class="d-flex justify-md-start justify-center">
+                  <v-btn @click="doPurchase" class="codeout-btn-size-default codeout-btn-a mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg">タスクを購入</v-btn>
+                </div>
               </div>
-              <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
+              <div class="d-flex justify-md-start justify-center">
+                <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
+              </div>
             </div>
           </client-only>
         </v-col>
       </v-row>
     </v-container>
 
-    <v-container fluid class="codeout-content-area py-sm-16 px-sm-16 pt-10 pb-10 px-6">
+    <v-container fluid class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <v-row class="mt-3 mb-6">
         <h3 class="px-2">レビュー一覧</h3>
       </v-row>

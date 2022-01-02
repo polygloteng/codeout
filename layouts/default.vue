@@ -71,56 +71,56 @@
     </v-main>
 
     <v-footer fluid color="white" class="d-block">
-      <v-row class="pt-10 pb-0 px-3 px-sm-16 flex-xs-column">
+      <v-row class="px-sm-15 pt-10 pb-0 px-2 flex-xs-column">
         <v-col cols="12" lg="8" md="7" sm="12" xs="12" class="codeout-footer-logo">
           <router-link to="/">
             <v-img :src="`${$config.assetsDomain}/images/logo.png`" contain max-width="158"></v-img>
           </router-link>
           <p class="text-caption mt-6">GitHubで実戦的に学べる<br>プログラミング学習サービス</p>
-          <v-divider class="mt-10 mb-5 d-md-none d-block"></v-divider>
+          <v-divider class="mt-8 mb-2 d-md-none d-block"></v-divider>
         </v-col>
         <v-col cols="12" lg="4" md="5" sm="12" xs="12" class="codeout-footer-link">
           <v-row>
             <!--リンク設定していただければと思います。（12/30佐藤）-->
             <v-col cols="6">
-              <p class="mb-0 pl-3">サービス</p>
+              <p class="mb-0">サービス</p>
               <v-list dense>
                 <v-list-item-group>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- CODEOUTについて</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- CODEOUTについて</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- プレミアム会員</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- プレミアム会員</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list-item-group>
               </v-list>
             </v-col>
             <v-col cols="6">
-              <p class="mb-0 pl-3">ご利用にあたって</p>
+              <p class="mb-0">ご利用にあたって</p>
               <v-list dense>
                 <v-list-item-group>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- 利用規約</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- 利用規約</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- プライバシーポリシー</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- プライバシーポリシー</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- 特定商取引法に基づく表記</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- 特定商取引法に基づく表記</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item to="#">
+                  <v-list-item to="#" class="pl-1 pr-0">
                     <v-list-item-content>
-                      <v-list-item-title class="grey--text">- 運営会社</v-list-item-title>
+                      <v-list-item-title class="grey--text caption">- 運営会社</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list-item-group>
@@ -129,7 +129,7 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-row class="pt-0 pb-0 px-3 px-sm-16 pb-sm-6">
+      <v-row class="px-sm-16 py-0 px-3">
         <v-col class="codeout-footer-copyright">
           <p class="grey--text caption">Copyright &copy; 2019 株式会社ポリグロット</p>
         </v-col>
