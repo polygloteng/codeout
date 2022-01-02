@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar color="white" app clipped-right>
+    <v-app-bar color="white" app flat clipped-right>
       <router-link to="/">
         <v-img :src="`${$config.assetsDomain}/images/logo.png`" contain max-width="130"></v-img>
       </router-link>
@@ -14,20 +14,22 @@
           <v-btn text to="/signin"><i class="codeout-icon"><v-img :src="`${$config.assetsDomain}/images/icon_tri.svg`"></v-img></i>サインイン</v-btn>
           <v-btn text to="/signup"><i class="codeout-icon"><v-img :src="`${$config.assetsDomain}/images/icon_tri.svg`"></v-img></i>会員登録</v-btn>
         </v-toolbar-items>
-        <v-app-bar-nav-icon class="d-block d-md-none" @click.stop="data.drawer = !data.drawer"></v-app-bar-nav-icon>
       </client-only>
       <v-text-field
-        placeholder="タスクを検索"
+        placeholder=""
         single-line
         hide-details
         dense
         filled
         rounded
         append-icon="mdi-magnify"
-        class="d-none d-md-block shrink ml-6"
+        class="shrink ml-6"
         v-model="data.keywords"
         @keydown.enter="doSearch"
       ></v-text-field>
+      <client-only>
+        <v-app-bar-nav-icon class="d-block d-md-none" @click.stop="data.drawer = !data.drawer"></v-app-bar-nav-icon>
+      </client-only>
     </v-app-bar>
     <!-- absoluteを指定することでドロワーが表示されていない場合でも領域が確保されてしまうことを防止する -->
     <!-- absoluteが指定されるとv-app-barで上部が一部隠れてしまうが、temporaryを指定して最前部に表示することでこれを防止している -->
