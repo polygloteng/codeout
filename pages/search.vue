@@ -1,17 +1,26 @@
 <template>
   <div>
-
     <v-container fluid class="codeout-head-area py-sm-10 px-sm-16 py-10 px-6">
-      <h2 class="">「{{ keywords }}」のレッスン一覧</h2>
+      <h2 class="">「{{ keywords }}」のタスク一覧</h2>
     </v-container>
 
     <v-container fluid class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <v-row>
         <!--サムネ画像の表示確認用に、ファイル名末尾の連番をループカウントで暫定的に付与しています。（12/29佐藤）-->
-        <v-col class="codeout-card-align-stretch pa-sm-6 pa-3" v-for="(task, index) in tasks" :key="task.name" cols="12" xs="12" sm="6" md="4" lg="3" xl="3">
+        <v-col
+          class="codeout-card-align-stretch pa-sm-6 pa-3"
+          v-for="(task, index) in tasks"
+          :key="task.name"
+          cols="12"
+          xs="12"
+          sm="6"
+          md="4"
+          lg="3"
+          xl="3"
+        >
           <v-card class="rounded-lg" hover :to="'/tasks/' + task.objectID">
             <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/29佐藤）-->
-            <v-img height="240" :src="`${$config.assetsDomain}/images/top_study_thumb0${index+1}.png`"></v-img>
+            <v-img height="240" :src="`${$config.assetsDomain}/images/top_study_thumb0${index + 1}.png`"></v-img>
             <v-card-title>{{ task.name }}</v-card-title>
             <v-card-text>
               <v-row class="mx-0">
@@ -34,7 +43,6 @@
         </v-col>
       </v-row>
     </v-container>
-
   </div>
 </template>
 

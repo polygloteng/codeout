@@ -1,4 +1,4 @@
-import { onBeforeMount, computed, InjectionKey, Ref, inject } from '@nuxtjs/composition-api'
+import { onBeforeMount, inject } from '@nuxtjs/composition-api'
 import {
   User as FirebaseUser,
   AdditionalUserInfo,

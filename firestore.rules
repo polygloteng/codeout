@@ -76,6 +76,10 @@ service cloud.firestore {
         && request.resource.data.updated == request.time
         && !exists(userPath(request.auth.uid))
         && existsAfter(userPath(request.auth.uid))
+      allow update: if request.auth != null && request.auth.uid == uid
+        && isValidPublicProfile(request.resource.data)
+        && request.resource.data.created == resource.data.created
+        && request.resource.data.updated == request.time
     }
     match /tasks/{task} {
       allow read: if true
