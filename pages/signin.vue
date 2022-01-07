@@ -1,6 +1,21 @@
 <template>
-  <div class="mx-auto mt-10" style="width: 200px">
-    <v-btn @click="signInEx">GitHubログイン</v-btn>
+  <div>
+
+    <v-container fluid class="codeout-head-area py-sm-10 px-sm-16 py-10 px-6">
+      <h2 class="mb-6">ログイン</h2>
+      <p>GitHubアカウントを使用してサインインしてください。</p>
+    </v-container>
+    <!--リンク設定していただければと思います。（12/30佐藤）-->
+    <v-container fluid class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
+      <v-row class="justify-center pa-3">
+        <v-card width="100%" max-width="490" class="rounded-lg pa-md-10 pa-6 mx-md-6 my-6 mx-0">
+          <h3 class="codeout-text-leftline">会員済みのお客様</h3>
+          <v-btn @click="signInEx" class="text-sm-button text-caption codeout-btn-size-large codeout-btn-a mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg text-sm-button text-overline"><i class="codeout-icon"><v-img :src="`${$config.assetsDomain}/images/icon_github.svg`"></v-img></i>GitHubアカウントでサインイン</v-btn>
+          <p class="grey--text">※会員登録がまだのお客様は<router-link to="/">こちら</router-link>から会員登録をお願いします。</p>
+        </v-card>
+      </v-row>
+    </v-container>
+
   </div>
 </template>
 
