@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { getAuth, Unsubscribe } from 'firebase/auth'
 import { UserInfo } from '~/types/auth'
 import { userConverter, profileConverter } from '~/lib/converters'
-import { CurrentUser } from '~/lib/constants'
+import { CurrentUser, UpdateCurrentUser } from '~/lib/constants'
 
 const plugin: Plugin = async (context) => {
   const currentUser = ref<UserInfo | null>(null)
@@ -28,16 +28,27 @@ const plugin: Plugin = async (context) => {
           githubUserId: userSnapshot.data()!.github_uid,
           githubUserName: userSnapshot.data()!.github_username,
           nickname: profileSnapshot.data()!.nickname,
-          thumbnailURL: user.photoURL ?? '',
+          thumbnailURL: profileSnapshot.data()!.thumbnail_url,
         }
       }
       resolve(unsubscribe)
     })
   })
 
+  const updateCurrentUser = (userInfo: UserInfo) => {
+    currentUser.value = {
+      systemUserId: userInfo.systemUserId,
+      githubUserId: userInfo.githubUserId,
+      githubUserName: userInfo.githubUserName,
+      nickname: userInfo.nickname,
+      thumbnailURL: userInfo.thumbnailURL,
+    }
+  }
+
   onGlobalSetup(() => {
     console.log('onGlobalSetup called')
     provide(CurrentUser, currentUser)
+    provide(UpdateCurrentUser, updateCurrentUser)
     onUnmounted(unsubscribe)
   })
 }

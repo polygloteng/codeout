@@ -1,8 +1,20 @@
-import { onBeforeMount, useAsync, ref } from '@nuxtjs/composition-api'
-import { Firestore, doc, collection, getDoc, getDocs, query, orderBy } from 'firebase/firestore'
+import { onBeforeMount, useAsync, ref, reactive, inject } from '@nuxtjs/composition-api'
+import {
+  Firestore,
+  doc,
+  collection,
+  getDoc,
+  getDocs,
+  updateDoc,
+  query,
+  orderBy,
+  DocumentReference,
+  serverTimestamp,
+} from 'firebase/firestore'
 import { UserInfo } from '~/types/auth'
 import { User, PublicProfile, Purchase } from '~/types/db'
 import { userConverter, profileConverter, purchaseConverter } from '~/lib/converters'
+import { UpdateCurrentUser } from '~/lib/constants'
 
 export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | null) => {
   const user = ref<User>()
@@ -42,14 +54,63 @@ export const useUser = ({ $db }: { $db: Firestore }, currentUser: UserInfo | nul
   return { user, profile, purchases }
 }
 
+const makeProfileRef = ($db: Firestore, user_id: string): DocumentReference<PublicProfile> => {
+  return doc($db, 'public-profiles', user_id).withConverter(profileConverter)
+}
+
+interface ProfileData {
+  nickname: string
+  thumbnail_url: string
+}
+
 export const useProfile = ({ $db }: { $db: Firestore }, uid: string) => {
   const profile = ref<PublicProfile>()
+  const data = reactive<ProfileData>({
+    nickname: '',
+    thumbnail_url: '',
+  })
   useAsync(async () => {
-    const profileSnapshot = await getDoc(doc($db, 'public-profiles', uid).withConverter(profileConverter))
+    const profileSnapshot = await getDoc(makeProfileRef($db, uid).withConverter(profileConverter))
     if (!profileSnapshot.exists()) {
       throw new Error('public profile does not exist')
     }
     profile.value = profileSnapshot.data()
+    data.nickname = profile.value.nickname
+    data.thumbnail_url = profile.value.thumbnail_url
   })
-  return { profile }
+  const updateCurrentUser = inject(UpdateCurrentUser)
+  if (updateCurrentUser === undefined) {
+    throw new Error('updateCurrentUser is not provided')
+  }
+  const doEdit = async (currentUser: UserInfo | null, nickname: string, thumbnail_url: string) => {
+    if (!currentUser) throw new Error('User must be logged in')
+    if (nickname.length <= 0) throw new Error('nickname is required')
+    if (thumbnail_url.length <= 0) throw new Error('thumbnail_url is required')
+
+    const profileRef = makeProfileRef($db, uid)
+    const profileSnapshot = await getDoc(profileRef)
+    if (!profileSnapshot.exists()) {
+      throw new Error('public profile does not exist')
+    }
+    const now = serverTimestamp()
+    try {
+      await updateDoc(profileRef, {
+        nickname: nickname,
+        thumbnail_url: thumbnail_url,
+        updated: now,
+      })
+      updateCurrentUser({
+        systemUserId: currentUser.systemUserId,
+        githubUserId: currentUser.githubUserId,
+        githubUserName: currentUser.githubUserName,
+        nickname: nickname,
+        thumbnailURL: thumbnail_url,
+      })
+      console.log('doEdit completed')
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+  return { profile, data, doEdit }
 }
