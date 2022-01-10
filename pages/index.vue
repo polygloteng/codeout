@@ -15,6 +15,9 @@
           >
         </v-col>
       </v-row>
+      <v-row class="justify-center mt-10 mb-0">
+        <v-img contain max-width="53" :src="`${$config.assetsDomain}/images/icon_scroll.svg`"></v-img>
+      </v-row>
     </v-container>
 
     <v-container fluid class="codeout-topgrid-area codeout-bg-grad py-sm-16 px-sm-16 py-16 px-6 primary white--text">
