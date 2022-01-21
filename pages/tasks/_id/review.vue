@@ -6,8 +6,8 @@
     </v-container>
 
     <v-container fluid v-if="task && currentUser" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
-      <v-row class="justify-center">
-        <v-card width="100%" max-width="930" class="ma-6 pa-md-10 pa-6">
+      <v-row class="justify-center py-md-3 pa-6">
+        <v-card width="100%" max-width="930" class="pa-md-10 pa-3">
           <v-row>
             <v-col cols="12" md="3" sm="12" xs="12">
               <client-only>

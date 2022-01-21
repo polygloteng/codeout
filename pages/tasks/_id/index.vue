@@ -23,7 +23,6 @@
             size="24"
             class="d-inline-block"
           ></v-rating>
-          <!--購入処理が動作しませんでした。（12/31佐藤）-->
           <client-only>
             <div class="mt-6" v-if="purchase">
               <div class="text-h5 text-left font-weight-bold mt-10">リポジトリ</div>
@@ -34,19 +33,31 @@
           </client-only>
           <p class="mt-6 text-body1 text-left">{{ task.description }}</p>
           <client-only>
-            <!--購入処理が動作しませんでした。（12/31佐藤）-->
-            <div class="">
-              <div v-if="!currentUser"><router-link to="/signup">会員登録して購入</router-link></div>
-              <div v-else-if="purchase">購入済み</div>
-              <div v-else-if="isPurchasing">購入処理実行中</div>
+            <div class="mt-6 mb-6">
+              <!--デザイン指定がないため暫定的にスタイルをつけておきました。（1/10佐藤）-->
+              <div v-if="!currentUser">
+                <div class="d-flex justify-md-start justify-center">
+                  <router-link to="/signup">会員登録して購入</router-link>
+                </div>
+              </div>
+              <div v-else-if="purchase">
+                <div class="d-flex justify-md-start justify-center">
+                  <p class="codeout-mission-bg rounded-pill caption py-1">購入済み</p>
+                </div>
+              </div>
+              <div v-else-if="isPurchasing">
+                <div class="d-flex justify-md-start justify-center">
+                  <p class="codeout-mission-bg rounded-pill caption py-1">購入処理実行中</p>
+                </div>
+              </div>
               <div v-else>
                 <div class="d-flex justify-md-start justify-center">
                   <v-btn @click="doPurchase" class="codeout-btn-size-default codeout-btn-a mt-10 mb-10 v-btn v-btn--is-elevated v-btn--has-bg">タスクを購入</v-btn>
                 </div>
               </div>
-              <div class="d-flex justify-md-start justify-center">
-                <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
-              </div>
+            </div>
+            <div class="d-flex justify-md-start justify-center">
+              <div v-if="currentUser"><router-link :to="'/tasks/' + task.id + '/review'">レビューを書く</router-link></div>
             </div>
           </client-only>
         </v-col>

@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
       <div class="codeout-mypage-wrapper">
         <v-row class="justify-center flex-row-reverse px-sm-3 pa-0">
@@ -8,30 +9,28 @@
               <h2>マイページ</h2>
               <h3 class="mt-9 mb-3">購入済みタスク</h3>
               <v-divider class="mt-3 mb-9"></v-divider>
-              <!--モックアップ（12/31佐藤）-->
-              <div v-for="n of 3" :key="n" class="codeout-buyed-tasks">
-                <!--ループ開始-->
+              <!--サムネ画像の表示確認用に、ファイル名末尾の連番をループカウントで暫定的に付与しています。（1/10佐藤）-->
+              <div class="codeout-buyed-tasks" v-for="(purchase, index) in purchases" :key="purchase.task.ref.id">
                 <v-row class="codeout-buyed-item my-3">
                   <v-col cols="12" md="4" sm="12" xs="12">
                     <client-only>
-                      <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（12/31佐藤）-->
-                      <v-img class="" :src="`${$config.assetsDomain}/images/top_study_thumb01.png`"></v-img>
+                      <!--v-rowのボックス要素全体にaタグをつけるとリポジトリURLがクリックできないのでサムネ画像にだけaタグをつけています。（1/10佐藤）-->
+                      <a :href="'/tasks/' + purchase.task.ref.id">
+                        <!--DB側に画像もしくはファイル名情報を持たせた方が良いかもしれません。（1/10佐藤）-->
+                        <v-img :src="`${$config.assetsDomain}/images/top_study_thumb0${index + 1}.png`"></v-img>
+                      </a>
                     </client-only>
                   </v-col>
                   <v-col cols="12" md="8" sm="12" xs="12">
-                    <h3 class="mb-2">
-                      ダミーのタスクです。ダミーのタスクです。ダミーのタスクです。ダミーのタスクです。
-                    </h3>
-                    <p class="codeout-mission-bg rounded-pill caption py-1">未完了</p>
+                    <h3 class="mb-2">{{ purchase.task.name }}</h3>
+                    <p class="codeout-mission-bg rounded-pill caption py-1" v-if="purchase.task_completed">完了</p>
+                    <p class="codeout-mission-bg rounded-pill caption py-1" v-else>未完了</p>
                     <div class="mt-2">
-                      <a class="caption" href="#"
-                        >URL:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</a
-                      >
+                      <a class="caption" :href="purchase.repo_url" target="_blank">{{ purchase.repo_url }}</a>
                     </div>
                   </v-col>
                 </v-row>
               </div>
-              <!--ループ終了-->
             </v-card>
           </v-col>
 
@@ -71,35 +70,6 @@
       </div>
     </v-container>
 
-    <!--動作しなかったため、モックアップで作成しました。（12/31佐藤）-->
-    <v-container fluid v-if="user && profile" class="codeout-content-area py-sm-16 px-sm-16 py-16 px-6">
-      <div class="codeout-mypage-wrapper">
-        <v-row class="justify-center flex-row-reverse px-sm-3 pa-0">
-          <v-col cols="12" md="12" sm="12" xs="12">
-            <v-card class="rounded-lg pa-sm-6 pa-md-10 pa-6">
-              <div class="text-h5 font-weight-bold mt-10">購入済みタスク</div>
-              <v-row justify="center">
-                <v-col cols="12" xl="8">
-                  <v-row>
-                    <v-col v-for="purchase in purchases" :key="purchase.task.ref.id" cols="12" sm="6" md="4">
-                      <v-card class="pa-2" outlined tile hover :to="'/tasks/' + purchase.task.ref.id">
-                        <v-card-title>{{ purchase.task.name }}</v-card-title>
-                        <v-img height="250" :src="`${$config.assetsDomain}/images/study.png`"></v-img>
-                        <div v-if="purchase.task_completed">完了</div>
-                        <div v-else>未完了</div>
-                      </v-card>
-                      <div class="text-body1 text-left">
-                        <a :href="purchase.repo_url" target="_blank">{{ purchase.repo_url }}</a>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-        </v-row>
-      </div>
-    </v-container>
   </div>
 </template>
 
