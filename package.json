@@ -15,7 +15,7 @@
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/composition-api": "^0.33.1",
     "algoliasearch": "^4.14.2",
-    "core-js": "^3.26.0",
+    "core-js": "^3.26.1",
     "firebase": "^9.14.0",
     "nuxt": "^2.15.7",
     "vuetify": "^2.6.12",
