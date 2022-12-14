@@ -18,7 +18,7 @@
     "core-js": "^3.26.1",
     "firebase": "^9.15.0",
     "nuxt": "^2.15.7",
-    "vuetify": "^2.6.12",
+    "vuetify": "^2.6.13",
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
