@@ -9988,10 +9988,10 @@ vuetify@^2.6:
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.6.14.tgz#a5bf662de938efe0450ac59776b04f760f5407d2"
   integrity sha512-nr6wU3uTzhhEPssH23cW0Ee/hCrayp7cjl3nNjM2OmNwiJlV91tZiL1VO3597SqZyjh1xIa+m9J2rpKTSdIlrA==
 
-vuetify@^3.1.8:
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.1.8.tgz#15a1b1713d1374c87f1a65dabaf185e820f410f6"
-  integrity sha512-yODCnRxERSvcBwC6qPiySVhmZzNZ2Yme6b2lNLY1G8W/hbipAtbTCFVGB4ZY/qY7D7JNQBxzgVfZme7bDY9ZrQ==
+vuetify@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.2.3.tgz#05767c3d88068654b757d33789b8c249f1d38e00"
+  integrity sha512-o7IJm/P5Ttp9ItF1ytQihsLzv4jxIYVfI4Ypkkqc4A7N2MeTmkDOPGbDNUgJ+G1p2upL00LCbc73A9YM8xYVpg==
 
 vuex-module-decorators@^2.0.0:
   version "2.0.0"
